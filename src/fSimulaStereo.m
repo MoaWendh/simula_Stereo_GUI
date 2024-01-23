@@ -10,11 +10,15 @@ pixelSize= handles.pixelSize;
 sensorSize= handles.sensorSize(1)*pixelSize;
 
 % Origem do sistema de coordenadas do plano sensor:
-u0= handles.sensorOrigin(1)*handles.pixelSize;
-yo= handles.sensorOrigin(2)*handles.pixelSize;
+u0_L= handles.sensorOrigin_L(1)*handles.pixelSize;
+yo_L= handles.sensorOrigin_L(2)*handles.pixelSize;
+u0_R= handles.sensorOrigin_R(1)*handles.pixelSize;
+yo_R= handles.sensorOrigin_R(2)*handles.pixelSize;
+
 
 % COmprimento focal em pixels para mm:
-f= handles.comprimentoFocal*handles.pixelSize;
+f_L= handles.comprimentoFocal_L(1)*handles.pixelSize;
+f_R= handles.comprimentoFocal_R(1)*handles.pixelSize;
 
 % Chama a função que gera a matriz de transformação homogênea da câmera esquerda com relação ao ao sist. de coordenadas do mundo:
 matrizT_World= fGeraMatrizTransformacao_LeftCamWorld(handles);
@@ -23,10 +27,14 @@ matrizT_World= fGeraMatrizTransformacao_LeftCamWorld(handles);
 matrizT_Stereo= fGeraMatrizTransformacao_Stereo(handles);
 
 % Coordenadas dos pontos 3D no espaço:
-P3D= handles.xyz;
+if handles.carregaPontosFromFile
+    P3D= handles.pontos3D;
+else
+    P3D= handles.xyz;
+end
 
 % Gera as coordenadas do ponto 3D no plano imagem, ainda em mm, para a scam. esquerda e direita:
-[p_left p_right]= fGeraCoordenadasPlanoImagem_mm(f, matrizT_World, matrizT_Stereo, P3D);
+[p_left p_right]= fGeraCoordenadasPlanoImagem_mm(f, matrizT_World, matrizT_Stereo, P3D, handles.sensorSize, handles.pixelSize, handles.sensorOrigin);
 
 
 

@@ -22,6 +22,6 @@ rotLeftCam= rotX*rotY*rotZ;
 transLeftCam= handles.transLeftCamWorld;
 
 % Gera a matriz de transformação da câmera esquerda com relação ao mundo:
-matrixT_World= [rotLeftCam transLeftCam'];   
+matrixT_World= [rotLeftCam transLeftCam'; [0 0 0 1]];   
 
 end

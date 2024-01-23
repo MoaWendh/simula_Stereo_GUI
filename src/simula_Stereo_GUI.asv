@@ -804,22 +804,10 @@ if hObject.Value
     handles.pbLoadParametrosCalibracao.Enable= 'on';
     handles.editRotacaoStereo.Enable= 'off';    
     handles.editTranslacaoStereo.Enable= 'off'; 
-    handles.editComprimentoFocal.Enable= 'off'; 
-    handles.editOrigemSenror.Enable= 'off';
-    handles.editDistorcaoRadial.Enable= 'off';
-    handles.editDistorcaoTangencial.Enable= 'off';
-    handles.editIncertezaComprimentoFocal.Enable= 'off';
-    handles.editIncertezaBaseline.Enable= 'off';
 else
     handles.pbLoadParametrosCalibracao.Enable= 'off';
     handles.editRotacaoStereo.Enable= 'on'; 
     handles.editTranslacaoStereo.Enable= 'on';
-    handles.editComprimentoFocal.Enable= 'on'; 
-    handles.editOrigemSenror.Enable= 'on';
-    handles.editDistorcaoRadial.Enable= 'on';
-    handles.editDistorcaoTangencial.Enable= 'on';
-    handles.editIncertezaComprimentoFocal.Enable= 'on';
-    handles.editIncertezaBaseline.Enable= 'on';    
 end
 
 handles.carregaCalibracaoFromFile= hObject.Value;
@@ -860,6 +848,9 @@ handles.incertezaComprimentoFocal_R= paramCalib.incerteza_ComprimentoFocal_R;
 handles.incertezaRotacaoStereo= paramCalib.incerteza_RotStereo;
 handles.incertezaTranslacaoStereo= paramCalib.incerteza_Translacao;
 
+% Atualiza os valores na tela GUI:
+handles.editComprimentoFocal.String= mat2str(paramCalib.comprimentoFocal_L(1)); 
+handles.editOrigemSenror.String= single(mat2str(handles.sensorOrigin_L));
 
 % Update handles structure
 guidata(hObject, handles);
