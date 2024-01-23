@@ -17,18 +17,18 @@ yo= handles.sensorOrigin(2)*handles.pixelSize;
 f= handles.comprimentoFocal*handles.pixelSize;
 
 % Chama a função que gera a matriz de transformação homogênea da câmera esquerda com relação ao ao sist. de coordenadas do mundo:
-matrizT_World= fGeraMatrizTransformacao_LeftCamWorld(handles);
+matrixT_World= fGeraMatrizTransformacao_LeftCamWorld(handles);
 
 % Chama a função que gera a matriz de transformação Stereo, ou seja a transformação da câmera direita com relação à cÂmera esquerda:
-matrizT_Stereo= fGeraMatrizTransformacao_Stereo(handles);
+matrixT_Stereo= fGeraMatrizTransformacao_Stereo(handles);
+
+% Gera as coordenadas do ponto 3D no plano imagem ainda em mm:
+[p_left p_right]= fGeraCoordenadasPlanoImagem_mm(f, matrixT_World, matrixT_Stereo);
 
 % Coordenadas dos pontos 3D no espaço:
-P3D= handles.xyz;
-
-% Gera as coordenadas do ponto 3D no plano imagem, ainda em mm, para a scam. esquerda e direita:
-[p_left p_right]= fGeraCoordenadasPlanoImagem_mm(f, matrizT_World, matrizT_Stereo, P3D);
-
-
+X= handles.xyz(1);
+Y= handles.xyz(2);
+Z= handles.xyz(3);
 
 XYZ_H= [X Y Z 1];
 

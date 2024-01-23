@@ -1,0 +1,6 @@
+function [ul vl ud vd]= fGeraCoordeandasPlanoImagem(handles)
+
+% Extrai as coordeandas do centro do plano imagem:
+u0= handles.
+
+end

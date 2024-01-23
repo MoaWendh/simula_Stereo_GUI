@@ -22,7 +22,7 @@ function varargout = simula_Stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help simula_Stereo_GUI
 
-% Last Modified by GUIDE v2.5 20-Jan-2024 17:17:24
+% Last Modified by GUIDE v2.5 22-Jan-2024 10:59:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -100,71 +100,8 @@ guidata(hObject, handles);
 
 
 function editDistanciaObjetoZ_Callback(hObject, eventdata, handles)
-% hObject    handle to editDistanciaObjetoZ (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of editDistanciaObjetoZ as text
-%        str2double(get(hObject,'String')) returns contents of editDistanciaObjetoZ as a double
-
-handles.distanciaObjeto= str2double(hObject.String);
-
-% Update handles structure
-guidata(hObject, handles);
 
 
-
-
-% --- Executes during object creation, after setting all properties.
-function editDistanciaObjetoZ_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editDistanciaObjetoZ (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-handles.distanciaObjeto= str2double(hObject.String);
-
-% Update handles structure
-guidata(hObject, handles);
-
-
-
-function editLarguraObjetoX_Callback(hObject, eventdata, handles)
-% hObject    handle to editLarguraObjetoX (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of editLarguraObjetoX as text
-%        str2double(get(hObject,'String')) returns contents of editLarguraObjetoX as a double
-
-handles.larguraObjeto= str2double(hObject.String);
-
-% Update handles structure
-guidata(hObject, handles);
-
-
-
-% --- Executes during object creation, after setting all properties.
-function editLarguraObjetoX_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editLarguraObjetoX (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-handles.larguraObjeto= str2double(hObject.String);
-
-% Update handles structure
-guidata(hObject, handles);
 
 
 % --- Executes on button press in pbSair.
@@ -194,36 +131,7 @@ guidata(hObject, handles);
 
 
 
-function editAlturaObjetoY_Callback(hObject, eventdata, handles)
-% hObject    handle to editAlturaObjetoY (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of editAlturaObjetoY as text
-%        str2double(get(hObject,'String')) returns contents of editAlturaObjetoY as a double
-
-handles.alturaObjeto= str2double(hObject.String);
-
-% Update handles structure
-guidata(hObject, handles);
-
-
-% --- Executes during object creation, after setting all properties.
-function editAlturaObjetoY_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editAlturaObjetoY (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-handles.alturaObjeto= str2double(hObject.String);
-
-% Update handles structure
-guidata(hObject, handles);
 
 
 
@@ -380,3 +288,418 @@ handles.incertezaDisparidade= 0.0078;
 % Update handles structure
 guidata(hObject, handles);
 
+
+
+
+function editBaseLine_Callback(hObject, eventdata, handles)
+% hObject    handle to editBaseLine (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editBaseLine as text
+%        str2double(get(hObject,'String')) returns contents of editBaseLine as a double
+
+
+handles.baseLine= str2double(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editBaseLine_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editBaseLine (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.baseLine= str2double(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+function editComprimentoFocal_Callback(hObject, eventdata, handles)
+% hObject    handle to editComprimentoFocal (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editComprimentoFocal as text
+%        str2double(get(hObject,'String')) returns contents of editComprimentoFocal as a double
+
+handles.comprimentoFocal= str2double(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editComprimentoFocal_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editComprimentoFocal (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.comprimentoFocal= str2double(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+function editCoordenadasXYZ_Callback(hObject, eventdata, handles)
+% hObject    handle to editCoordenadasXYZ (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editCoordenadasXYZ as text
+%        str2double(get(hObject,'String')) returns contents of editCoordenadasXYZ as a double
+
+
+handles.xyz= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editCoordenadasXYZ_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editCoordenadasXYZ (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+handles.xyz= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+
+function editIncertezaComprimentoFocal_Callback(hObject, eventdata, handles)
+% hObject    handle to editIncertezaComprimentoFocal (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editIncertezaComprimentoFocal as text
+%        str2double(get(hObject,'String')) returns contents of editIncertezaComprimentoFocal as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function editIncertezaComprimentoFocal_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editIncertezaComprimentoFocal (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function editIncertezaBaseline_Callback(hObject, eventdata, handles)
+% hObject    handle to editIncertezaBaseline (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editIncertezaBaseline as text
+%        str2double(get(hObject,'String')) returns contents of editIncertezaBaseline as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function editIncertezaBaseline_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editIncertezaBaseline (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function editRotacaoStereo_Callback(hObject, eventdata, handles)
+% hObject    handle to editRotacaoStereo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editRotacaoStereo as text
+%        str2double(get(hObject,'String')) returns contents of editRotacaoStereo as a double
+
+handles.rotStereo= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editRotacaoStereo_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editRotacaoStereo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.rotStereo= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+function aditTranslacaoStereo_Callback(hObject, eventdata, handles)
+% hObject    handle to aditTranslacaoStereo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of aditTranslacaoStereo as text
+%        str2double(get(hObject,'String')) returns contents of aditTranslacaoStereo as a double
+
+handles.transStereo= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function aditTranslacaoStereo_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to aditTranslacaoStereo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.transStereo= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+function editSensorSize_Callback(hObject, eventdata, handles)
+% hObject    handle to editSensorSize (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editSensorSize as text
+%        str2double(get(hObject,'String')) returns contents of editSensorSize as a double
+
+handles.sensorSize= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function editSensorSize_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editSensorSize (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.sensorSize= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+function editOrigemSenror_Callback(hObject, eventdata, handles)
+% hObject    handle to editOrigemSenror (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editOrigemSenror as text
+%        str2double(get(hObject,'String')) returns contents of editOrigemSenror as a double
+
+
+handles.sensorOrigin= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editOrigemSenror_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editOrigemSenror (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.sensorOrigin= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+function editDistorcaoRadial_Callback(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoRadial (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editDistorcaoRadial as text
+%        str2double(get(hObject,'String')) returns contents of editDistorcaoRadial as a double
+
+handles.radialDistortion= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+% --- Executes during object creation, after setting all properties.
+function editDistorcaoRadial_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoRadial (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.radialDistortion= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+function editDistorcaoTangencial_Callback(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoTangencial (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editDistorcaoTangencial as text
+%        str2double(get(hObject,'String')) returns contents of editDistorcaoTangencial as a double
+
+handles.tangencialDistortion= str2num(hObject.String);
+
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editDistorcaoTangencial_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoTangencial (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.tangencialDistortion= str2num(hObject.String);
+
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+
+function editRotacaoLeftCam_World_Callback(hObject, eventdata, handles)
+% hObject    handle to editRotacaoLeftCam_World (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editRotacaoLeftCam_World as text
+%        str2double(get(hObject,'String')) returns contents of editRotacaoLeftCam_World as a double
+
+handles.rotLeftCamWorld= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+% --- Executes during object creation, after setting all properties.
+function editRotacaoLeftCam_World_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editRotacaoLeftCam_World (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.rotLeftCamWorld= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+function editTranslacaoLeftCam_World_Callback(hObject, eventdata, handles)
+% hObject    handle to editTranslacaoLeftCam_World (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editTranslacaoLeftCam_World as text
+%        str2double(get(hObject,'String')) returns contents of editTranslacaoLeftCam_World as a double
+
+handles.transLeftCamWorld= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editTranslacaoLeftCam_World_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editTranslacaoLeftCam_World (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.transLeftCamWorld= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
