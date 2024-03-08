@@ -29,22 +29,23 @@ else
     % Gera a matriz de transformação da câmera esquerda com relação ao mundo:
     matrixT_Stereo= [rot trans'; [0 0 0 1]];   
 end
-    angRot_X= handles.rotStereo(1);
-    angRot_Y= handles.rotStereo(2);
-    angRot_Z= handles.rotStereo(3);
 
-    % Gera a matrix de rotação da câmera direita com relação à esquerda:
-    rotX= rotx(angRot_X);
-    rotY= rotx(angRot_Y);
-    rotZ= rotx(angRot_Z);
+angRot_X= handles.rotStereo(1);
+angRot_Y= handles.rotStereo(2);
+angRot_Z= handles.rotStereo(3);
 
-    % Gera a matriz de rotação da câmera esquerda:
-    rot= rotX*rotY*rotZ;
+% Gera a matrix de rotação da câmera direita com relação à esquerda:
+rotX= rotx(angRot_X);
+rotY= rotx(angRot_Y);
+rotZ= rotx(angRot_Z);
 
-    % Extrai a matriz de translação da câmera esquerda:
-    trans= handles.transStereo;
+% Gera a matriz de rotação da câmera esquerda:
+rot= rotX*rotY*rotZ;
 
-    % Gera a matriz de transformação da câmera esquerda com relação ao mundo:
-    matrixT_Stereo= [rot trans'; [0 0 0 1]]; 
+% Extrai a matriz de translação da câmera esquerda:
+trans= handles.transStereo;
+
+% Gera a matriz de transformação da câmera esquerda com relação ao mundo:
+matrixT_Stereo= [rot trans'; [0 0 0 1]]; 
 
 end

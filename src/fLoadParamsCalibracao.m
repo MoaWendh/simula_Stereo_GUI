@@ -1,10 +1,12 @@
-function paramCalib= fLoadParamsCalibracao(handles)
+function [paramCalib loadParamCalibOk]= fLoadParamsCalibracao(pathCalibrationFile)
 
-pathFile= fullfile(handles.pathCalibrationFile,'*.mat');
+pathFile= fullfile(pathCalibrationFile,'*.mat');
 [fileName, path]= uigetfile(pathFile);
 
 if ~fileName
     msgbox('Cancelada abertura do arquivo de calibração', '', 'warn', 'modal');
+    paramCalib= 0;
+    loadParamCalibOk= 0;
     return;
 end
 
@@ -32,4 +34,5 @@ paramCalib.incerteza_ComprimentoFocal_R= fc_right_error;
 paramCalib.incerteza_RotStereo= om_error;
 paramCalib.incerteza_Translacao= T_error;
 
+loadParamCalibOk= 1;
 end

@@ -55,7 +55,7 @@ function simula_Stereo_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 %*************** Dados usuário abaixo **************************************
 % Definição de alguns nomes de folder para sereme gerados:
 handles.pathBase= 'C:\Projetos\Matlab\programas_GUI\simula_Stereo_GUI\src\in';
-handles.pathCalibrationFile= 'D:\Moacir\ensaios\Calibracao\Estereo\26_08_2023_A\bouguet';
+handles.pathCalibrationFile= 'D:\Moacir\ensaios\Calibracao\vigente\estereo\bouguet';
 
 % Choose default command line output for simula_Stereo_GUI
 handles.output = hObject;
@@ -470,6 +470,14 @@ function editRotacaoStereo_Callback(hObject, eventdata, handles)
 
 handles.rotStereo= str2num(hObject.String);
 
+% Formata para exibir o resultado na saída:
+formato='%15.4f'; 
+str_A= num2str(handles.rotStereo(1,:), formato);
+str_B= num2str(handles.rotStereo(2,:), formato);
+str_C= num2str(handles.rotStereo(3,:), formato );
+msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
+handles.outRotacaoStereo.String= str2mat(msg);
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -488,8 +496,6 @@ end
 
 handles.rotStereo= str2num(hObject.String);
 
-% Update handles structure
-guidata(hObject, handles);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -505,6 +511,12 @@ function editTranslacaoStereo_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of editTranslacaoStereo as a double
 
 handles.transStereo= str2num(hObject.String);
+
+% Formata para exibir o resultado na saída:
+formato='%15.4f'; 
+str= num2str(handles.transStereo, formato);
+msg= sprintf('  %s',str);
+handles.outTranslacaoStereo.String= str2mat(msg);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -688,6 +700,13 @@ function editRotacaoLeftCam_World_Callback(hObject, eventdata, handles)
 
 handles.rotLeftCamWorld= str2num(hObject.String);
 
+% Formata para exibir o resultado na saída:
+formato='%15.4f'; 
+str_A= num2str(handles.rotLeftCamWorld(1,:), formato);
+str_B= num2str(handles.rotLeftCamWorld(2,:), formato);
+str_C= num2str(handles.rotLeftCamWorld(3,:), formato );
+msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
+handles.outRotacaoWorld.String= str2mat(msg);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -708,6 +727,14 @@ end
 
 handles.rotLeftCamWorld= str2num(hObject.String);
 
+% Formata para exibir o resultado na saída:
+formato='%15.4f'; 
+str_A= num2str(handles.rotLeftCamWorld(1,:), formato);
+str_B= num2str(handles.rotLeftCamWorld(2,:), formato);
+str_C= num2str(handles.rotLeftCamWorld(3,:), formato );
+msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
+handles.outRotacaoWorld.String= str2mat(msg);
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -722,6 +749,12 @@ function editTranslacaoLeftCam_World_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of editTranslacaoLeftCam_World as a double
 
 handles.transLeftCamWorld= str2num(hObject.String);
+
+% Formata para exibir o resultado na saída:
+formato='%15.4f'; 
+str= num2str(handles.transLeftCamWorld, formato);
+msg= sprintf('  %s',str);
+handles.outTranslacaoWorld.String= str2mat(msg);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -740,6 +773,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 handles.transLeftCamWorld= str2num(hObject.String);
+
+% Formata para exibir o resultado na saída:
+formato='%15.4f'; 
+str= num2str(handles.transLeftCamWorld, formato);
+msg= sprintf('  %s',str);
+handles.outTranslacaoWorld.String= str2mat(msg);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -819,7 +858,21 @@ else
     handles.editDistorcaoRadial.Enable= 'on';
     handles.editDistorcaoTangencial.Enable= 'on';
     handles.editIncertezaComprimentoFocal.Enable= 'on';
-    handles.editIncertezaBaseline.Enable= 'on';    
+    handles.editIncertezaBaseline.Enable= 'on'; 
+    
+    handles.rotStereo= str2num(handles.editRotacaoStereo.String);
+    formato='%15.4f'; 
+    str_A= num2str(handles.rotStereo(1,:), formato);
+    str_B= num2str(handles.rotStereo(2,:), formato);
+    str_C= num2str(handles.rotStereo(3,:), formato );
+    msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
+    handles.outRotacaoStereo.String= str2mat(msg);
+        
+    handles.transStereo= str2num(handles.editTranslacaoStereo.String);
+    formato='%15.4f'; 
+    str= num2str(handles.transStereo, formato);
+    msg= sprintf('  %s',str);
+    handles.outTranslacaoStereo.String= str2mat(msg);   
 end
 
 handles.carregaCalibracaoFromFile= hObject.Value;
@@ -833,14 +886,37 @@ function pbLoadParametrosCalibracao_Callback(hObject, eventdata, handles)
 % hObject    handle to pbLoadParametrosCalibracao (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+clc;
 
 % Chama a função para carregar os parêmtros de calibração do sistema
 % estéreo, considerando apenas a calibração Bouguet:
-paramCalib= fLoadParamsCalibracao(handles);
+[paramCalib loadParamCalibOk]= fLoadParamsCalibracao(handles.pathCalibrationFile);
+
+if ~loadParamCalibOk
+    return;
+end
 
 % Define os parâmetros carregados:
-handles.rotStereo= paramCalib.rotStereo;
-handles.transStereo= paramCalib.transStereo;
+handles.rotStereo= fRodrigues(paramCalib.rotStereo);
+
+% Para exibir os valores da matriz de rotação:
+format short;
+formato='%15.4f'; 
+str_A= num2str(handles.rotStereo(1,:), formato);
+str_B= num2str(handles.rotStereo(2,:), formato);
+str_C= num2str(handles.rotStereo(3,:), formato );
+msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
+handles.outRotacaoStereo.String= str2mat(msg);
+
+% Carrega o vetor de translação:
+handles.transStereo= paramCalib.transStereo';
+
+% Para exibir os valores do vertor de translação:
+formato='%15.4f'; 
+str= num2str(handles.transStereo', formato);
+msg= sprintf('  %s',str);
+handles.outTranslacaoStereo.String= str2mat(msg);
+
 
 handles.sensorOrigin_L= paramCalib.sensorOrigin_L;
 handles.sensorOrigin_R= paramCalib.sensorOrigin_R;
@@ -849,7 +925,7 @@ handles.comprimentoFocal_L= paramCalib.comprimentoFocal_L;
 handles.comprimentoFocal_R= paramCalib.comprimentoFocal_R;
 
 handles.radialDistortion_L= paramCalib.radialDistortion_L;
-handles.tangencialDistortion_L= paramCalib.tangencialDistortion_L
+handles.tangencialDistortion_L= paramCalib.tangencialDistortion_L;
 
 handles.radialDistortion_R= paramCalib.radialDistortion_R;
 handles.tangencialDistortion_R= paramCalib.tangencialDistortion_R;

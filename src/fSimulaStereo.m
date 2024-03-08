@@ -34,26 +34,12 @@ else
 end
 
 % Gera as coordenadas do ponto 3D no plano imagem, ainda em mm, para a scam. esquerda e direita:
-[p_left p_right]= fGeraCoordenadasPlanoImagem_mm(f, matrizT_World, matrizT_Stereo, P3D, handles.sensorSize, handles.pixelSize, handles.sensorOrigin);
+[p_left p_right]= fGeraCoordenadasPlanoImagem_mm(f_L, f_R, matrizT_World, matrizT_Stereo, P3D, ...
+                                                 handles.sensorSize, handles.pixelSize, ... 
+                                                 handles.sensorOrigin_L, handles.sensorOrigin_R);
 
-
-
-XYZ_H= [X Y Z 1];
-
-% Matriz de projeção da câmera esquerda:
-
-
-
-xe= (f/Z)*X;
-xd= (f/Z)*X;
-ye= (f/Z)*X;
-yd= (f/Z)*X;
-
-
-
-
-
-
+Este software não está finalizado!!!!
+                                             
 % Define o ângulo de varredura azimutal em função da distância Y do LiDAR ao objeto e a largura X do objeto: 
 distanciaY= handles.distanciaLidarObjeto;
 larguraX= handles.larguraObjeto; 
