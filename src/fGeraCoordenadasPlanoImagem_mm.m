@@ -18,13 +18,13 @@ matrizT_World_inv= inv(matrizT_World);
 [numPontos3D c]= size(P);
 
 for ctPt=1:numPontos3D
-    % Gera uma coordenada homogênea para o ponto P:
-    P_H0=[P(ctPt,:) 1];
+    % Gera uma coordenada homogênea para o ponto P. Como a entrada é em metros, as coordenadas do ponto são convertidas para mm:
+    P_H0=[P(ctPt,:)*1000 1];
     
     % Transformar o ponto P com relação ao sistema de cooredanadas da câmera esquerda (Verificar a página 323 do livro do Peter Corke):
     P_HC_left(ctPt,:)= matrizT_World_inv*P_H0'; 
 
-    % Transformar o ponto P com relação ao sistema de cooredanadas da câmera esquerda (Verificar a página 323 do livro do Peter Corke):
+    % Transformar o ponto P com relação ao sistema de cooredanadas da câmera direita (Verificar a página 323 do livro do Peter Corke):
     P_HC_rigth(ctPt,:)= inv(matrizT_Stereo)*P_HC_left(ctPt,:)';
 
     % Acha as coordenadas no plano imagem esquerdo em mm:

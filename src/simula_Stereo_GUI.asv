@@ -63,7 +63,7 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incerteza.X^2 + handles.incerteza.Y^2));
+handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incertezaX^2 + handles.incertezaY^2));
 
 % UIWAIT makes simula_Stereo_GUI wait for user response (see UIRESUME)
 % uiwait(handles.botton);
@@ -93,7 +93,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.incerteza.X= str2double(hObject.String);
+handles.incertezaX= str2double(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -130,8 +130,7 @@ handles.resultadoSimulacao= fSimulaIncertezaStereo(handles.ptoPlanoImagem_left, 
                                                    handles.comprimentoFocal_L, handles.comprimentoFocal_R, ...
                                                    handles.rotStereo, handles.transStereo, ...
                                                    handles.rotLeftCamWorld, handles.transLeftCamWorld,...
-                                                   handles.carregaCalibracaoFromFile, handles.numSimulacoes, ...
-                                                   handles.incerteza);
+                                                   handles.carregaCalibracaoFromFile, handles.numSimulacoes);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -179,10 +178,10 @@ function editIncertezaY_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncertezaY as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaY as a double
 
-handles.incerteza.Y= str2double(hObject.String);
+handles.incertezaY= str2double(hObject.String);
 
 if ~handles.rdDefineIncertezaDisparidadeManualmente.Value
-    handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incerteza.X^2 + handles.incerteza.Y^2));
+    handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incertezaX^2 + handles.incertezaY^2));
 end
 
 % Update handles structure
@@ -202,7 +201,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.incerteza.Y= str2double(hObject.String);
+handles.incertezaY= str2double(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -217,10 +216,10 @@ function editIncertezaX_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncertezaX as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaX as a double
 
-handles.incerteza.X= str2double(hObject.String);
+handles.incertezaX= str2double(hObject.String);
 
 if ~handles.rdDefineIncertezaDisparidadeManualmente.Value
-    handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incerteza.X^2 + handles.incerteza.Y^2));
+    handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incertezaX^2 + handles.incertezaY^2));
 end
 
 % Update handles structure
@@ -235,7 +234,7 @@ function editIncertezaDisparidade_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncertezaDisparidade as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaDisparidade as a double
 
-handles.incerteza.Disparidade= str2double(hObject.String);
+handles.incertezaDisparidade= str2double(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -269,11 +268,12 @@ function rdDefineIncertezaDisparidadeManualmente_Callback(hObject, eventdata, ha
 if hObject.Value
     handles.StaticIncertezaDisparidade.Enable= 'off';
     handles.editIncertezaDisparidade.Enable= 'on';
-    handles.incerteza.Disparidade= str2double(handles.editIncertezaDisparidade.String);
+    handles.incertezaDisparidade= str2double(handles.editIncertezaDisparidade.String);
 else
     handles.StaticIncertezaDisparidade.Enable= 'on';
     handles.editIncertezaDisparidade.Enable= 'off'; 
-    handles.incerteza.Disparidade= num2str(sqrt(handles.incerteza.X^2 + handles.incerteza.Y^2));  
+    handles.incertezaDisparidade= num2str(sqrt(handles.incertezaX^2 + handles.incertezaY^2));
+   
 end
 
 % Update handles structure
@@ -286,7 +286,7 @@ function StaticIncertezaDisparidade_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-handles.incerteza.Disparidade= 0.0078;
+handles.incertezaDisparidade= 0.0078;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -402,8 +402,8 @@ function editIncertezaComprimentoFocal_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncertezaComprimentoFocal as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaComprimentoFocal as a double
 
-handles.incerteza.ComprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)]; 
-handles.incerteza.ComprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)]; 
+handles.incertezaComprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)]; 
+handles.incertezaComprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)]; 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -421,8 +421,8 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.incerteza.ComprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)];
-handles.incerteza.ComprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)]; 
+handles.incertezaComprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)];
+handles.incertezaComprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)]; 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -436,7 +436,7 @@ function editIncertezaBaseline_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncertezaBaseline as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaBaseline as a double
 
-handles.incerteza.TranslacaoStereo= str2double(hObject.String); 
+handles.incertezaTranslacaoStereo= str2double(hObject.String); 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -454,7 +454,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.incerteza.TranslacaoStereo= str2double(hObject.String); 
+handles.incertezaTranslacaoStereo= str2double(hObject.String); 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -939,8 +939,8 @@ handles.incerteza.TranslacaoStereo= sqrt(paramCalib.incerteza_Translacao(1)^2 + 
                                     
 
 % ********************** Atualiza algunsparêmtros no painel GUI  **********************
-handles.editIncertezaComprimentoFocal.String= sprintf('%4.4f', handles.incerteza.ComprimentoFocal_L(1)*handles.pixelSize);
-handles.editIncertezaBaseline.String= sprintf('%4.4f',handles.incerteza.TranslacaoStereo);
+handles.editIncertezaComprimentoFocal.String= sprintf('%4.4f', handles.incertezaComprimentoFocal_L(1)*handles.pixelSize);
+handles.editIncertezaBaseline.String= sprintf('%4.4f',handles.incertezaTranslacaoStereo);
 handles.editComprimentoFocal.String= num2str(handles.comprimentoFocal_L(1)); 
 handles.editBaseLine.String= num2str(handles.baseLine);
 
