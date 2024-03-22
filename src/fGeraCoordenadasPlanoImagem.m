@@ -63,18 +63,18 @@ plot(p_left_out(:,1), p_left_out(:,2), '.r', 'MarkerSize', 15);
 title('Plano Imagem Esquerdo');
 xlabel('X - Pixels');
 ylabel('Y - Pixels');
-xlim([0 2048]);
-ylim([0 2048]);
+% xlim([0 2048]);
+% ylim([0 2048]);
 grid on;
-% axis equal;
+axis equal;
 
 subplot(1,2,2);
 plot(p_right_out(:,1), p_right_out(:,2), '.b', 'MarkerSize', 15);
 title('Plano Imagem Direito');
 xlabel('X - Pixels');
 ylabel('Y - Pixels');
-xlim([0 2048]);
-ylim([0 2048]);
+% xlim([0 2048]);
+% ylim([0 2048]);
 grid on;
-% axis equal;
+axis equal;
 end

@@ -22,9 +22,14 @@ paramCalib.sensorOrigin_R= cc_right;
 paramCalib.comprimentoFocal_L= fc_left;
 paramCalib.comprimentoFocal_R= fc_right;
 
+paramCalib.skew_L= alpha_c_left;
+paramCalib.skew_R= alpha_c_right;
+
+paramCalib.Distortion_L= kc_left;
 paramCalib.radialDistortion_L= kc_left(1:2,1);
 paramCalib.tangencialDistortion_L= kc_left(3:4,1);
 
+paramCalib.Distortion_R= kc_right;
 paramCalib.radialDistortion_R= kc_right(1:2,1);
 paramCalib.tangencialDistortion_R= kc_right(3:4,1);
 

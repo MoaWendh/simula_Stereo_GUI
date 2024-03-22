@@ -22,7 +22,7 @@ function varargout = simula_Stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help simula_Stereo_GUI
 
-% Last Modified by GUIDE v2.5 20-Mar-2024 21:31:51
+% Last Modified by GUIDE v2.5 22-Mar-2024 18:42:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -63,7 +63,7 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incertezaX^2 + handles.incertezaY^2));
+handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incerteza.X^2 + handles.incerteza.Y^2));
 
 % UIWAIT makes simula_Stereo_GUI wait for user response (see UIRESUME)
 % uiwait(handles.botton);
@@ -93,7 +93,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.incertezaX= str2double(hObject.String);
+handles.incerteza.X= str2double(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -124,12 +124,14 @@ function pbSimulaIncertezaStereo_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+if handles.carregaPontosFromFile
+    pontos3D= handles.pontos3D_real;
+else
+    pontos3D= handles.pontos3D_sim;
+end
+
 handles.resultadoSimulacao= fSimulaIncertezaStereo(handles.ptoPlanoImagem_left, handles.ptoPlanoImagem_right, ...
-                                                   handles.pontos3D, handles.pixelSize, handles.sensorSize, ... 
-                                                   handles.sensorOrigin_L, handles.sensorOrigin_R, ...
-                                                   handles.comprimentoFocal_L, handles.comprimentoFocal_R, ...
-                                                   handles.rotStereo, handles.transStereo, ...
-                                                   handles.rotLeftCamWorld, handles.transLeftCamWorld,...
+                                                   pontos3D, handles.paramStereo, handles.incerteza, ...
                                                    handles.carregaCalibracaoFromFile, handles.numSimulacoes);
 
 % Update handles structure
@@ -146,7 +148,7 @@ function editPixelSize_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editPixelSize as text
 %        str2double(get(hObject,'String')) returns contents of editPixelSize as a double
 
-handles.pixelSize= str2double(hObject.String);
+handles.paramStereo.pixelSize= str2double(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -164,7 +166,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.pixelSize= str2double(hObject.String);
+handles.paramStereo.pixelSize= str2double(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -178,10 +180,10 @@ function editIncertezaY_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncertezaY as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaY as a double
 
-handles.incertezaY= str2double(hObject.String);
+handles.incerteza.Y= str2double(hObject.String);
 
 if ~handles.rdDefineIncertezaDisparidadeManualmente.Value
-    handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incertezaX^2 + handles.incertezaY^2));
+    handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incerteza.X^2 + handles.incerteza.Y^2));
 end
 
 % Update handles structure
@@ -201,7 +203,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.incertezaY= str2double(hObject.String);
+handles.incerteza.Y= str2double(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -216,10 +218,10 @@ function editIncertezaX_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncertezaX as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaX as a double
 
-handles.incertezaX= str2double(hObject.String);
+handles.incerteza.X= str2double(hObject.String);
 
 if ~handles.rdDefineIncertezaDisparidadeManualmente.Value
-    handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incertezaX^2 + handles.incertezaY^2));
+    handles.StaticIncertezaDisparidade.String= num2str(sqrt(handles.incerteza.X^2 + handles.incerteza.Y^2));
 end
 
 % Update handles structure
@@ -234,7 +236,7 @@ function editIncertezaDisparidade_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncertezaDisparidade as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaDisparidade as a double
 
-handles.incertezaDisparidade= str2double(hObject.String);
+handles.incerteza.Disparidade= str2double(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -268,12 +270,11 @@ function rdDefineIncertezaDisparidadeManualmente_Callback(hObject, eventdata, ha
 if hObject.Value
     handles.StaticIncertezaDisparidade.Enable= 'off';
     handles.editIncertezaDisparidade.Enable= 'on';
-    handles.incertezaDisparidade= str2double(handles.editIncertezaDisparidade.String);
+    handles.incerteza.Disparidade= str2double(handles.editIncertezaDisparidade.String);
 else
     handles.StaticIncertezaDisparidade.Enable= 'on';
     handles.editIncertezaDisparidade.Enable= 'off'; 
-    handles.incertezaDisparidade= num2str(sqrt(handles.incertezaX^2 + handles.incertezaY^2));
-   
+    handles.incerteza.Disparidade= num2str(sqrt(handles.incerteza.X^2 + handles.incerteza.Y^2));  
 end
 
 % Update handles structure
@@ -286,7 +287,7 @@ function StaticIncertezaDisparidade_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-handles.incertezaDisparidade= 0.0078;
+handles.incerteza.Disparidade= 0.0078;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -303,7 +304,7 @@ function editBaseLine_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of editBaseLine as a double
 
 
-handles.baseLine= str2double(hObject.String);
+handles.paramStereo.baseLine= str2double(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -321,31 +322,30 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.baseLine= str2double(hObject.String);
+handles.paramStereo.baseLine= str2double(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
 
 
-function editComprimentoFocal_Callback(hObject, eventdata, handles)
-% hObject    handle to editComprimentoFocal (see GCBO)
+function editComprimentoFocal_L_Callback(hObject, eventdata, handles)
+% hObject    handle to editComprimentoFocal_L (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of editComprimentoFocal as text
-%        str2double(get(hObject,'String')) returns contents of editComprimentoFocal as a double
+% Hints: get(hObject,'String') returns contents of editComprimentoFocal_L as text
+%        str2double(get(hObject,'String')) returns contents of editComprimentoFocal_L as a double
 
 % Carrega o coprimento focal convertido em mm:
-handles.comprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)];
-handles.comprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)];
+handles.paramStereo.comprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)];
 
 % Update handles structure
 guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function editComprimentoFocal_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editComprimentoFocal (see GCBO)
+function editComprimentoFocal_L_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editComprimentoFocal_L (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 % Hint: edit controls usually have a white background on Windows.
@@ -354,8 +354,8 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.comprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)];
-handles.comprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)];
+% Carrega o coprimento focal convertido em mm:
+handles.paramStereo.comprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)];
 
 % Update handles structure
 guidata(hObject, handles);
@@ -369,7 +369,7 @@ function editCoordenadasXYZ_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editCoordenadasXYZ as text
 %        str2double(get(hObject,'String')) returns contents of editCoordenadasXYZ as a double
 
-handles.pontos3D= str2num(hObject.String);
+handles.pontos3D_sim= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -387,31 +387,30 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.pontos3D= str2num(hObject.String);
+handles.pontos3D_sim= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
 
 
 
-function editIncertezaComprimentoFocal_Callback(hObject, eventdata, handles)
-% hObject    handle to editIncertezaComprimentoFocal (see GCBO)
+function editIncertezaComprimentoFocal_L_Callback(hObject, eventdata, handles)
+% hObject    handle to editIncertezaComprimentoFocal_L (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of editIncertezaComprimentoFocal as text
-%        str2double(get(hObject,'String')) returns contents of editIncertezaComprimentoFocal as a double
+% Hints: get(hObject,'String') returns contents of editIncertezaComprimentoFocal_L as text
+%        str2double(get(hObject,'String')) returns contents of editIncertezaComprimentoFocal_L as a double
 
-handles.incertezaComprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)]; 
-handles.incertezaComprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)]; 
+handles.incerteza.ComprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)]; 
 
 % Update handles structure
 guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function editIncertezaComprimentoFocal_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editIncertezaComprimentoFocal (see GCBO)
+function editIncertezaComprimentoFocal_L_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editIncertezaComprimentoFocal_L (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -421,8 +420,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.incertezaComprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)];
-handles.incertezaComprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)]; 
+handles.incerteza.ComprimentoFocal_L= [str2double(hObject.String) str2double(hObject.String)];
 
 % Update handles structure
 guidata(hObject, handles);
@@ -436,7 +434,7 @@ function editIncertezaBaseline_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncertezaBaseline as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaBaseline as a double
 
-handles.incertezaTranslacaoStereo= str2double(hObject.String); 
+handles.incerteza.TranslacaoStereo= str2double(hObject.String); 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -454,7 +452,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.incertezaTranslacaoStereo= str2double(hObject.String); 
+handles.incerteza.TranslacaoStereo= str2double(hObject.String); 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -469,13 +467,13 @@ function editRotacaoStereo_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editRotacaoStereo as text
 %        str2double(get(hObject,'String')) returns contents of editRotacaoStereo as a double
 
-handles.rotStereo= str2num(hObject.String);
+handles.paramStereo.matrizR= str2num(hObject.String);
 
 % Formata para exibir o resultado na saída:
 formato='%15.4f'; 
-str_A= num2str(handles.rotStereo(1,:), formato);
-str_B= num2str(handles.rotStereo(2,:), formato);
-str_C= num2str(handles.rotStereo(3,:), formato );
+str_A= num2str(handles.paramStereo.matrizR(1,:), formato);
+str_B= num2str(handles.paramStereo.matrizR(2,:), formato);
+str_C= num2str(handles.paramStereo.matrizR(3,:), formato );
 msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
 handles.outRotacaoStereo.String= str2mat(msg);
 
@@ -495,7 +493,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.rotStereo= str2num(hObject.String);
+handles.paramStereo.matrizR= str2num(hObject.String);
 
 
 % Update handles structure
@@ -511,11 +509,11 @@ function editTranslacaoStereo_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editTranslacaoStereo as text
 %        str2double(get(hObject,'String')) returns contents of editTranslacaoStereo as a double
 
-handles.transStereo= str2num(hObject.String);
+handles.paramStereo.vetorT= str2num(hObject.String);
 
 % Formata para exibir o resultado na saída:
 formato='%15.4f'; 
-str= num2str(handles.transStereo, formato);
+str= num2str(handles.paramStereo.vetorT, formato);
 msg= sprintf('  %s',str);
 handles.outTranslacaoStereo.String= str2mat(msg);
 
@@ -535,7 +533,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.transStereo= str2num(hObject.String);
+handles.paramStereo.vetorT= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -550,10 +548,12 @@ function editSensorSize_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editSensorSize as text
 %        str2double(get(hObject,'String')) returns contents of editSensorSize as a double
 
-handles.sensorSize= str2num(hObject.String);
+handles.paramStereo.sensorSize= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
+
+
 
 % --- Executes during object creation, after setting all properties.
 function editSensorSize_CreateFcn(hObject, eventdata, handles)
@@ -567,32 +567,31 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.sensorSize= str2num(hObject.String);
+handles.paramStereo.sensorSize= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
 
 
 
-function editOrigemSenror_Callback(hObject, eventdata, handles)
-% hObject    handle to editOrigemSenror (see GCBO)
+function editOrigemSenror_L_Callback(hObject, eventdata, handles)
+% hObject    handle to editOrigemSenror_L (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of editOrigemSenror as text
-%        str2double(get(hObject,'String')) returns contents of editOrigemSenror as a double
+% Hints: get(hObject,'String') returns contents of editOrigemSenror_L as text
+%        str2double(get(hObject,'String')) returns contents of editOrigemSenror_L as a double
 
 val= str2num(hObject.String);
-handles.sensorOrigin_L= val(1);
-handles.sensorOrigin_R= val(2);
+handles.paramStereo.sensorOrigin_L= val;
 
 % Update handles structure
 guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function editOrigemSenror_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editOrigemSenror (see GCBO)
+function editOrigemSenror_L_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editOrigemSenror_L (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -602,27 +601,26 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+
 val= str2num(hObject.String);
-handles.sensorOrigin_L= val(1);
-handles.sensorOrigin_R= val(2);
+handles.paramStereo.sensorOrigin_L= val;
 
 % Update handles structure
 guidata(hObject, handles);
 
 
 
-function editDistorcaoRadial_Callback(hObject, eventdata, handles)
-% hObject    handle to editDistorcaoRadial (see GCBO)
+function editDistorcaoRadial_L_Callback(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoRadial_L (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of editDistorcaoRadial as text
-%        str2double(get(hObject,'String')) returns contents of editDistorcaoRadial as a double
+% Hints: get(hObject,'String') returns contents of editDistorcaoRadial_L as text
+%        str2double(get(hObject,'String')) returns contents of editDistorcaoRadial_L as a double
 
 val= str2num(hObject.String);
 
-handles.radialDistortion_L= val;
-handles.radialDistortion_R= val;
+handles.paramStereo.radialDistortion_L= val;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -630,47 +628,8 @@ guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function editDistorcaoRadial_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editDistorcaoRadial (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-val= str2num(hObject.String);
-
-handles.radialDistortion_L= val;
-handles.radialDistortion_R= val;
-
-% Update handles structure
-guidata(hObject, handles);
-
-
-
-function editDistorcaoTangencial_Callback(hObject, eventdata, handles)
-% hObject    handle to editDistorcaoTangencial (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of editDistorcaoTangencial as text
-%        str2double(get(hObject,'String')) returns contents of editDistorcaoTangencial as a double
-
-val= str2num(hObject.String);
-
-handles.tangencialDistortion_L= val;
-handles.tangencialDistortion_R= val;
-
-% Update handles structure
-guidata(hObject, handles);
-
-
-% --- Executes during object creation, after setting all properties.
-function editDistorcaoTangencial_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editDistorcaoTangencial (see GCBO)
+function editDistorcaoRadial_L_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoRadial_L (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -682,8 +641,44 @@ end
 
 val= str2num(hObject.String);
 
-handles.tangencialDistortion_L= val;
-handles.tangencialDistortion_R= val;
+handles.paramStereo.radialDistortion_L= val;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+function editDistorcaoTangencial_L_Callback(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoTangencial_L (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editDistorcaoTangencial_L as text
+%        str2double(get(hObject,'String')) returns contents of editDistorcaoTangencial_L as a double
+
+val= str2num(hObject.String);
+
+handles.paramStereo.tangencialDistortion_L= val;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editDistorcaoTangencial_L_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoTangencial_L (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+val= str2num(hObject.String);
+
+handles.paramStereo.tangencialDistortion_L= val;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -699,13 +694,13 @@ function editRotacaoLeftCam_World_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editRotacaoLeftCam_World as text
 %        str2double(get(hObject,'String')) returns contents of editRotacaoLeftCam_World as a double
 
-handles.rotLeftCamWorld= str2num(hObject.String);
+handles.paramStereo.rotLeftCamWorld= str2num(hObject.String);
 
 % Formata para exibir o resultado na saída:
 formato='%15.4f'; 
-str_A= num2str(handles.rotLeftCamWorld(1,:), formato);
-str_B= num2str(handles.rotLeftCamWorld(2,:), formato);
-str_C= num2str(handles.rotLeftCamWorld(3,:), formato );
+str_A= num2str(handles.paramStereo.rotLeftCamWorld(1,:), formato);
+str_B= num2str(handles.paramStereo.rotLeftCamWorld(2,:), formato);
+str_C= num2str(handles.paramStereo.rotLeftCamWorld(3,:), formato );
 msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
 handles.outRotacaoWorld.String= str2mat(msg);
 
@@ -726,13 +721,13 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.rotLeftCamWorld= str2num(hObject.String);
+handles.paramStereo.rotLeftCamWorld= str2num(hObject.String);
 
 % Formata para exibir o resultado na saída:
 formato='%15.4f'; 
-str_A= num2str(handles.rotLeftCamWorld(1,:), formato);
-str_B= num2str(handles.rotLeftCamWorld(2,:), formato);
-str_C= num2str(handles.rotLeftCamWorld(3,:), formato );
+str_A= num2str(handles.paramStereo.rotLeftCamWorld(1,:), formato);
+str_B= num2str(handles.paramStereo.rotLeftCamWorld(2,:), formato);
+str_C= num2str(handles.paramStereo.rotLeftCamWorld(3,:), formato );
 msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
 handles.outRotacaoWorld.String= str2mat(msg);
 
@@ -749,11 +744,11 @@ function editTranslacaoLeftCam_World_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editTranslacaoLeftCam_World as text
 %        str2double(get(hObject,'String')) returns contents of editTranslacaoLeftCam_World as a double
 
-handles.transLeftCamWorld= str2num(hObject.String);
+handles.paramStereo.transLeftCamWorld= str2num(hObject.String);
 
 % Formata para exibir o resultado na saída:
 formato='%15.4f'; 
-str= num2str(handles.transLeftCamWorld, formato);
+str= num2str(handles.paramStereo.transLeftCamWorld, formato);
 msg= sprintf('  %s',str);
 handles.outTranslacaoWorld.String= str2mat(msg);
 
@@ -773,11 +768,11 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-handles.transLeftCamWorld= str2num(hObject.String);
+handles.paramStereo.transLeftCamWorld= str2num(hObject.String);
 
 % Formata para exibir o resultado na saída:
 formato='%15.4f'; 
-str= num2str(handles.transLeftCamWorld, formato);
+str= num2str(handles.paramStereo.transLeftCamWorld, formato);
 msg= sprintf('  %s',str);
 handles.outTranslacaoWorld.String= str2mat(msg);
 
@@ -802,6 +797,7 @@ else
 end
 
 handles.carregaPontosFromFile= hObject.Value;
+handles.pbSimulaIncertezaStereo.Enable= 'off';
 
 % Update handles structure
 guidata(hObject, handles);
@@ -813,7 +809,8 @@ function pbLoadPontos3D_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.pontos3D= fCarregPontos3D(handles);
+handles.pontos3D_real= fCarregPontos3D(handles);
+
 
 % Update handles structure
 guidata(hObject, handles);
@@ -844,34 +841,48 @@ if hObject.Value
     handles.pbLoadParametrosCalibracao.Enable= 'on';
     handles.editRotacaoStereo.Enable= 'off';    
     handles.editTranslacaoStereo.Enable= 'off'; 
-    handles.editComprimentoFocal.Enable= 'off'; 
-    handles.editOrigemSenror.Enable= 'off';
-    handles.editDistorcaoRadial.Enable= 'off';
-    handles.editDistorcaoTangencial.Enable= 'off';
-    handles.editIncertezaComprimentoFocal.Enable= 'off';
+    handles.editComprimentoFocal_L.Enable= 'off'; 
+    handles.editComprimentoFocal_R.Enable= 'off';
+    handles.editOrigemSenror_L.Enable= 'off';
+    handles.editOrigemSenror_R.Enable= 'off';     
+    handles.editDistorcaoRadial_L.Enable= 'off';
+    handles.editDistorcaoRadial_R.Enable= 'off';    
+    handles.editDistorcaoTangencial_L.Enable= 'off';
+    handles.editDistorcaoTangencial_R.Enable= 'off';     
+    handles.editIncertezaComprimentoFocal_L.Enable= 'off';
+    handles.editIncertezaComprimentoFocal_R.Enable= 'off';     
     handles.editIncertezaBaseline.Enable= 'off';
+    handles.editBaseLine.Enable= 'off';
+    handles.editIncertezaDisparidade.Enable= 'off';
 else
     handles.pbLoadParametrosCalibracao.Enable= 'off';
-    handles.editRotacaoStereo.Enable= 'on'; 
+    handles.editRotacaoStereo.Enable= 'on';
     handles.editTranslacaoStereo.Enable= 'on';
-    handles.editComprimentoFocal.Enable= 'on'; 
-    handles.editOrigemSenror.Enable= 'on';
-    handles.editDistorcaoRadial.Enable= 'on';
-    handles.editDistorcaoTangencial.Enable= 'on';
-    handles.editIncertezaComprimentoFocal.Enable= 'on';
+    handles.editComprimentoFocal_L.Enable= 'on';
+    handles.editComprimentoFocal_R.Enable= 'on'; 
+    handles.editOrigemSenror_L.Enable= 'on';
+    handles.editOrigemSenror_R.Enable= 'on';    
+    handles.editDistorcaoRadial_L.Enable= 'on';
+    handles.editDistorcaoRadial_R.Enable= 'on';    
+    handles.editDistorcaoTangencial_L.Enable= 'on';
+    handles.editDistorcaoTangencial_R.Enable= 'on';    
+    handles.editIncertezaComprimentoFocal_L.Enable= 'on';
+    handles.editIncertezaComprimentoFocal_R.Enable= 'on';    
     handles.editIncertezaBaseline.Enable= 'on'; 
+    handles.editBaseLine.Enable= 'on';
+    handles.editIncertezaDisparidade.Enable= 'on';    
     
-    handles.rotStereo= str2num(handles.editRotacaoStereo.String);
+    handles.paramStereo.matrizR= str2num(handles.editRotacaoStereo.String);
     formato='%15.4f'; 
-    str_A= num2str(handles.rotStereo(1,:), formato);
-    str_B= num2str(handles.rotStereo(2,:), formato);
-    str_C= num2str(handles.rotStereo(3,:), formato );
+    str_A= num2str(handles.paramStereo.matrizR(1,:), formato);
+    str_B= num2str(handles.paramStereo.matrizR(2,:), formato);
+    str_C= num2str(handles.paramStereo.matrizR(3,:), formato );
     msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
     handles.outRotacaoStereo.String= str2mat(msg);
         
-    handles.transStereo= str2num(handles.editTranslacaoStereo.String);
+    handles.paramStereo.vetorT= str2num(handles.editTranslacaoStereo.String);
     formato='%15.4f'; 
-    str= num2str(handles.transStereo, formato);
+    str= num2str(handles.paramStereo.vetorT, formato);
     msg= sprintf('  %s',str);
     handles.outTranslacaoStereo.String= str2mat(msg);   
 end
@@ -898,34 +909,41 @@ if ~loadParamCalibOk
 end
 
 % ********************** Carrega alguns parâmetros ************************************
+% Vetor de rotação estéreo:
+handles.paramStereo.vetorR= paramCalib.rotStereo;
+
 % Define os parâmetros carregados:
-handles.rotStereo= fRodrigues(paramCalib.rotStereo);
+handles.paramStereo.matrizR= fRodrigues(paramCalib.rotStereo);
 
 % Carrega o vetor de translação:
-handles.transStereo= paramCalib.transStereo';
+handles.paramStereo.vetorT= paramCalib.transStereo;
 
 % Calcula o baseline em mm a partir dos dados de calibração:
-handles.baseLine= sqrt(handles.transStereo(1)^2 + handles.transStereo(2)^2 + handles.transStereo(3)^2);
+handles.paramStereo.baseLine= sqrt(handles.paramStereo.vetorT(1)^2 + handles.paramStereo.vetorT(2)^2 + handles.paramStereo.vetorT(3)^2);
 
 % Carrega s coordendas do sensor a partir do arquivo de calibração:
-handles.sensorOrigin_L= paramCalib.sensorOrigin_L;
-handles.sensorOrigin_R= paramCalib.sensorOrigin_R;
+handles.paramStereo.sensorOrigin_L= paramCalib.sensorOrigin_L;
+handles.paramStereo.sensorOrigin_R= paramCalib.sensorOrigin_R;
 
-% Carrega os valores dos comprimentos focais das duas lentes R e L:
-handles.comprimentoFocal_L= paramCalib.comprimentoFocal_L*handles.pixelSize;
-handles.comprimentoFocal_R= paramCalib.comprimentoFocal_R*handles.pixelSize;
+% Carrega os valores dos comprimentos focais das duas lentes R e L e coverte em :
+handles.paramStereo.comprimentoFocal_L= paramCalib.comprimentoFocal_L;
+handles.paramStereo.comprimentoFocal_R= paramCalib.comprimentoFocal_R;
 
-% Carrega a distorção radial e tangencial do arquivo de calibração para a câmera esquerda:
-handles.radialDistortion_L= paramCalib.radialDistortion_L;
-handles.tangencialDistortion_L= paramCalib.tangencialDistortion_L;
+% Carrega a distorção radial e tangencial e o skell do arquivo de calibração para a câmera esquerda:
+handles.paramStereo.distorcaoLente_L= paramCalib.Distortion_L;
+handles.paramStereo.radialDistortion_L= paramCalib.radialDistortion_L;
+handles.paramStereo.tangencialDistortion_L= paramCalib.tangencialDistortion_L;
+handles.paramStereo.skell_L= paramCalib.skew_L;
 
-% Carrega a distorção radial e tangencial do arquivo de calibração para a câmera direita:
-handles.radialDistortion_R= paramCalib.radialDistortion_R;
-handles.tangencialDistortion_R= paramCalib.tangencialDistortion_R;
+% Carrega a distorção radial e tangencial e o skell do arquivo de calibração para a câmera direita:
+handles.paramStereo.distorcaoLente_R= paramCalib.Distortion_R;
+handles.paramStereo.radialDistortion_R= paramCalib.radialDistortion_R;
+handles.paramStereo.tangencialDistortion_R= paramCalib.tangencialDistortion_R;
+handles.paramStereo.skell_R= paramCalib.skew_R;
 
 
 % ********************** Carrega as incertezas *****************************************
-% Carrega a incerteza no comprimento focal a partir da calibração:
+% Carrega a incerteza no comprimento focal a partir da calibração e converte em pixel:
 handles.incerteza.ComprimentoFocal_L= paramCalib.incerteza_ComprimentoFocal_L;
 handles.incerteza.ComprimentoFocal_R= paramCalib.incerteza_ComprimentoFocal_R;
 
@@ -934,26 +952,31 @@ handles.incerteza.RotacaoStereo= paramCalib.incerteza_RotStereo;
 
 % Carrega a incerteza na translação entre uma câmera e outra a partir da calibração:
 handles.incerteza.TranslacaoStereo= sqrt(paramCalib.incerteza_Translacao(1)^2 + ...
-                                        paramCalib.incerteza_Translacao(2)^2 + ...
-                                        paramCalib.incerteza_Translacao(3)^2) ;
+                                         paramCalib.incerteza_Translacao(2)^2 + ...
+                                         paramCalib.incerteza_Translacao(3)^2) ;
                                     
-
+                                     
+                                     
 % ********************** Atualiza algunsparêmtros no painel GUI  **********************
-handles.editIncertezaComprimentoFocal.String= sprintf('%4.4f', handles.incertezaComprimentoFocal_L(1)*handles.pixelSize);
-handles.editIncertezaBaseline.String= sprintf('%4.4f',handles.incertezaTranslacaoStereo);
-handles.editComprimentoFocal.String= num2str(handles.comprimentoFocal_L(1)); 
-handles.editBaseLine.String= num2str(handles.baseLine);
+handles.editIncertezaComprimentoFocal_L.String= sprintf('%4.4f', handles.incerteza.ComprimentoFocal_L(1)*handles.paramStereo.pixelSize);
+handles.editIncertezaComprimentoFocal_R.String= sprintf('%4.4f', handles.incerteza.ComprimentoFocal_R(1)*handles.paramStereo.pixelSize);
+handles.editComprimentoFocal_L.String= num2str(handles.paramStereo.comprimentoFocal_L(1)*handles.paramStereo.pixelSize); 
+handles.editComprimentoFocal_R.String= num2str(handles.paramStereo.comprimentoFocal_R(1)*handles.paramStereo.pixelSize); 
+handles.editBaseLine.String= num2str(handles.paramStereo.baseLine);
+handles.editIncertezaBaseline.String= sprintf('%4.4f',handles.incerteza.TranslacaoStereo);
+handles.editOrigemSenror_L_Callback.String= num2str(handles.paramStereo.sensorOrigin_L);
 
 % Para exibir os valores da matriz de rotação:
-str_A= sprintf('%8.4f %8.4f %8.4f', handles.rotStereo(1,1), handles.rotStereo(1,2), handles.rotStereo(1,3));
-str_B= sprintf('%8.4f %8.4f %8.4f', handles.rotStereo(2,1), handles.rotStereo(2,2), handles.rotStereo(2,3));
-str_C= sprintf('%8.4f %8.4f %8.4f', handles.rotStereo(3,1), handles.rotStereo(3,2), handles.rotStereo(3,3));
+str_A= sprintf('%8.4f %8.4f %8.4f', handles.paramStereo.matrizR(1,1), handles.paramStereo.matrizR(1,2), handles.paramStereo.matrizR(1,3));
+str_B= sprintf('%8.4f %8.4f %8.4f', handles.paramStereo.matrizR(2,1), handles.paramStereo.matrizR(2,2), handles.paramStereo.matrizR(2,3));
+str_C= sprintf('%8.4f %8.4f %8.4f', handles.paramStereo.matrizR(3,1), handles.paramStereo.matrizR(3,2), handles.paramStereo.matrizR(3,3));
 msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
 handles.outRotacaoStereo.String= msg; %str2mat(msg);
 
 % Para exibir os valores do vetor de translação:
-msg= sprintf('%8.2f %8.2f %8.2f', handles.transStereo(1), handles.transStereo(2), handles.transStereo(3))
+msg= sprintf('%8.2f %8.2f %8.2f', handles.paramStereo.vetorT(1), handles.paramStereo.vetorT(2), handles.paramStereo.vetorT(3));
 handles.outTranslacaoStereo.String= msg;
+
 
 % Update handles structure
 guidata(hObject, handles);
@@ -988,25 +1011,33 @@ function pbCalaculaPontosNoPlanoImagem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-[handles.ptoPlanoImagem_left handles.ptoPlanoImagem_right]= fCalculaPontosNoPlanoImagem(handles.pontos3D, handles.pixelSize, handles.sensorSize, ... 
-                                                                    handles.sensorOrigin_L, handles.sensorOrigin_R, ...
-                                                                    handles.comprimentoFocal_L, handles.comprimentoFocal_R, ...
-                                                                    handles.rotStereo, handles.transStereo, ...
-                                                                    handles.rotLeftCamWorld, handles.transLeftCamWorld,...
-                                                                    handles.carregaCalibracaoFromFile);
-                                                                
-handles.editCoordPontoPlanoImagemLeft.String= sprintf('%4.0f  %4.0f',handles.ptoPlanoImagem_left(1), handles.ptoPlanoImagem_left(2)); 
-handles.editCoordPontoPlanoImagemRight.String= sprintf('%4.0f  %4.0f',handles.ptoPlanoImagem_right(1), handles.ptoPlanoImagem_right(2)); 
-
-if (handles.ptoPlanoImagem_left(1)>1024 || handles.ptoPlanoImagem_left(1)<-1024  || ... 
-    handles.ptoPlanoImagem_left(2)>1024 || handles.ptoPlanoImagem_left(2)<-1024 || ...
-    handles.ptoPlanoImagem_right(1)>1024 || handles.ptoPlanoImagem_right(1)<-1024 || ...
-    handles.ptoPlanoImagem_right(2)>1024 || handles.ptoPlanoImagem_right(2)<-1024)
-
-    msg= sprintf('As coordenadas do ponto P 3D estão fora do campo de visão do sistema estéreo!');
-    msgbox(msg, 'Atenção!', 'warn');
-    return;
+if handles.carregaPontosFromFile
+    pontos3D= handles.pontos3D_real;
+else
+    pontos3D= handles.pontos3D_sim;
 end
+    
+[handles.ptoPlanoImagem_left handles.ptoPlanoImagem_right]= fCalculaPontosNoPlanoImagem(pontos3D, ...
+                                                                                        handles.paramStereo, ...                                                                                         
+                                                                                        handles.carregaCalibracaoFromFile, ...
+                                                                                        handles.numSimulacoes);
+if ~handles.carregaPontosFromFile
+    handles.editCoordPontoPlanoImagemLeft.String= sprintf('%4.0f  %4.0f',handles.ptoPlanoImagem_left(1), handles.ptoPlanoImagem_left(2)); 
+    handles.editCoordPontoPlanoImagemRight.String= sprintf('%4.0f  %4.0f',handles.ptoPlanoImagem_right(1), handles.ptoPlanoImagem_right(2));
+else
+    handles.editCoordPontoPlanoImagemLeft.String= '?';
+    handles.editCoordPontoPlanoImagemRight.String= '?';
+end
+
+% if (handles.ptoPlanoImagem_left(1)>1024 || handles.ptoPlanoImagem_left(1)<-1024  || ... 
+%     handles.ptoPlanoImagem_left(2)>1024 || handles.ptoPlanoImagem_left(2)<-1024 || ...
+%     handles.ptoPlanoImagem_right(1)>1024 || handles.ptoPlanoImagem_right(1)<-1024 || ...
+%     handles.ptoPlanoImagem_right(2)>1024 || handles.ptoPlanoImagem_right(2)<-1024)
+% 
+%     msg= sprintf('As coordenadas do ponto P 3D estão fora do campo de visão do sistema estéreo!');
+%     msgbox(msg, 'Atenção!', 'warn');
+%     return;
+% end
                                                                 
      
 handles.pbSimulaIncertezaStereo.Enable= 'on';
@@ -1089,6 +1120,184 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 handles.numSimulacoes= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function outTranslacaoWorld_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to outTranslacaoWorld (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+
+
+function editComprimentoFocal_R_Callback(hObject, eventdata, handles)
+% hObject    handle to editComprimentoFocal_R (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editComprimentoFocal_R as text
+%        str2double(get(hObject,'String')) returns contents of editComprimentoFocal_R as a double
+
+handles.paramStereo.comprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)];
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editComprimentoFocal_R_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editComprimentoFocal_R (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.paramStereo.comprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)];
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+function editOrigemSenror_R_Callback(hObject, eventdata, handles)
+% hObject    handle to editOrigemSenror_R (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editOrigemSenror_R as text
+%        str2double(get(hObject,'String')) returns contents of editOrigemSenror_R as a double
+
+val= str2num(hObject.String);
+handles.paramStereo.sensorOrigin_R= val;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editOrigemSenror_R_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editOrigemSenror_R (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+val= str2num(hObject.String);
+handles.paramStereo.sensorOrigin_R= val;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+function editDistorcaoRadial_R_Callback(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoRadial_R (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editDistorcaoRadial_R as text
+%        str2double(get(hObject,'String')) returns contents of editDistorcaoRadial_R as a double
+
+val= str2num(hObject.String);
+
+handles.paramStereo.radialDistortion_R= val;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editDistorcaoRadial_R_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoRadial_R (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+val= str2num(hObject.String);
+
+handles.paramStereo.radialDistortion_R= val;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+function editDistorcaoTangencial_R_Callback(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoTangencial_R (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editDistorcaoTangencial_R as text
+%        str2double(get(hObject,'String')) returns contents of editDistorcaoTangencial_R as a double
+val= str2num(hObject.String);
+
+handles.paramStereo.tangencialDistortion_R= val;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editDistorcaoTangencial_R_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editDistorcaoTangencial_R (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+val= str2num(hObject.String);
+
+handles.paramStereo.tangencialDistortion_R= val;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+function editIncertezaComprimentoFocal_R_Callback(hObject, eventdata, handles)
+% hObject    handle to editIncertezaComprimentoFocal_R (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editIncertezaComprimentoFocal_R as text
+%        str2double(get(hObject,'String')) returns contents of editIncertezaComprimentoFocal_R as a double
+ 
+handles.incerteza.ComprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)]; 
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editIncertezaComprimentoFocal_R_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editIncertezaComprimentoFocal_R (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.incerteza.ComprimentoFocal_R= [str2double(hObject.String) str2double(hObject.String)]; 
 
 % Update handles structure
 guidata(hObject, handles);
