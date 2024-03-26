@@ -1,7 +1,7 @@
-function [XL,XR] = fStereoTriangulation(xL, xR, om, T, ...
+function [XL,XR] = fStereoTriangulation(xL, xR, om, T, ... 
                                         fc_left, cc_left, kc_left, alpha_c_left, ...
-                                        fc_right, cc_right, kc_right, alpha_c_right)
-                                    
+                                        fc_right, cc_right, kc_right, alpha_c_right),
+
 % [XL,XR] = stereo_triangulation(xL,xR,om,T,fc_left,cc_left,kc_left,alpha_c_left,fc_right,cc_right,kc_right,alpha_c_right),
 %
 % Function that computes the position of a set on N points given the left and right image projections.
@@ -28,8 +28,8 @@ function [XL,XR] = fStereoTriangulation(xL, xR, om, T, ...
 
 
 %--- Normalize the image projection according to the intrinsic parameters of the left and right cameras
-xt = fNormalizePixel(xL,fc_left,cc_left,kc_left,alpha_c_left);
-xtt = fNormalizePixel(xR,fc_right,cc_right,kc_right,alpha_c_right);
+xt = normalize_pixel(xL,fc_left,cc_left,kc_left,alpha_c_left);
+xtt = normalize_pixel(xR,fc_right,cc_right,kc_right,alpha_c_right);
 
 %--- Extend the normalized projections in homogeneous coordinates
 xt = [xt;ones(1,size(xt,2))];
@@ -39,9 +39,11 @@ xtt = [xtt;ones(1,size(xtt,2))];
 N = size(xt,2);
 
 %--- Rotation matrix corresponding to the rigid motion between left and right cameras:
-R = fRodrigues(om);
+R = rodrigues(om);
+
 
 %--- Triangulation of the rays in 3D space:
+
 u = R * xt;
 
 n_xt2 = dot(xt,xt);
@@ -63,6 +65,7 @@ Ztt = NN2./DD;
 
 X1 = xt .* repmat(Zt,[3 1]);
 X2 = R'*(xtt.*repmat(Ztt,[3,1])  - T_vect);
+
 
 %--- Left coordinates:
 XL = 1/2 * (X1 + X2);

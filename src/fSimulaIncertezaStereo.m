@@ -30,7 +30,7 @@ sensorSize= paramStereo.sensorSize(1)*pixelSize;
 sensorOrigem_L= paramStereo.sensorOrigin_L;
 sensorOrigem_R= paramStereo.sensorOrigin_R;
 % Carrega o vetor de rotação do sistema estéreo:
-vetorR=paramStereo.vetorR; 
+vetorR= paramStereo.vetorR; 
 % Matriz de rotação estéreo:
 R= paramStereo.matrizR;
 % Vetor de translação estéreo:

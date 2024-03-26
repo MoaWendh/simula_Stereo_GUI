@@ -22,7 +22,7 @@ function varargout = simula_Stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help simula_Stereo_GUI
 
-% Last Modified by GUIDE v2.5 22-Mar-2024 18:42:18
+% Last Modified by GUIDE v2.5 25-Mar-2024 12:50:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -667,8 +667,10 @@ str_C= num2str(handles.paramStereo.rotLeftCamWorld(3,:), formato );
 msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
 handles.outRotacaoWorld.String= str2mat(msg);
 
+
 % Update handles structure
 guidata(hObject, handles);
+
 
 
 
@@ -774,6 +776,7 @@ function pbLoadPontos3D_Callback(hObject, eventdata, handles)
 
 handles.pontos3D_real= fCarregPontos3D(handles);
 
+handles.pbCalaculaPontosNoPlanoImagem.Enable= 'on';
 
 % Update handles structure
 guidata(hObject, handles);
@@ -802,6 +805,7 @@ function rdLoadParamsCalibracao_Callback(hObject, eventdata, handles)
 
 if hObject.Value
     handles.pbLoadParametrosCalibracao.Enable= 'on';
+    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'off';
     handles.editRotacaoStereo.Enable= 'off';    
     handles.editTranslacaoStereo.Enable= 'off'; 
     handles.editComprimentoFocal_L.Enable= 'off'; 
@@ -819,6 +823,7 @@ if hObject.Value
     handles.editIncertezaDisparidade.Enable= 'off';
 else
     handles.pbLoadParametrosCalibracao.Enable= 'off';
+    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'on';
     handles.editRotacaoStereo.Enable= 'on';
     handles.editTranslacaoStereo.Enable= 'on';
     handles.editComprimentoFocal_L.Enable= 'on';
@@ -849,6 +854,21 @@ else
     msg= sprintf('  %s',str);
     handles.outTranslacaoStereo.String= str2mat(msg);   
 end
+
+
+% Formata para exibir o resultado na saída:
+formato='%15.4f'; 
+str_A= num2str(handles.paramStereo.rotLeftCamWorld(1,:), formato);
+str_B= num2str(handles.paramStereo.rotLeftCamWorld(2,:), formato);
+str_C= num2str(handles.paramStereo.rotLeftCamWorld(3,:), formato );
+msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
+handles.outRotacaoWorld.String= str2mat(msg);
+
+% Formata para exibir o resultado na saída:
+formato='%15.4f'; 
+str= num2str(handles.paramStereo.transLeftCamWorld, formato);
+msg= sprintf('  %s',str);
+handles.outTranslacaoWorld.String= str2mat(msg);
 
 handles.carregaCalibracaoFromFile= hObject.Value;
 
@@ -918,8 +938,7 @@ handles.incerteza.TranslacaoStereo= sqrt(paramCalib.incerteza_Translacao(1)^2 + 
                                          paramCalib.incerteza_Translacao(2)^2 + ...
                                          paramCalib.incerteza_Translacao(3)^2) ;
                                     
-                                     
-                                     
+                                                                        
 % ********************** Atualiza algunsparêmtros no painel GUI  **********************
 handles.editIncertezaComprimentoFocal_L.String= sprintf('%4.4f', handles.incerteza.ComprimentoFocal_L(1)*handles.paramStereo.pixelSize);
 handles.editIncertezaComprimentoFocal_R.String= sprintf('%4.4f', handles.incerteza.ComprimentoFocal_R(1)*handles.paramStereo.pixelSize);
@@ -932,20 +951,39 @@ handles.editOrigemSenror_R.String= [sprintf('%4.4f    ',handles.paramStereo.sens
 
 % handles.editIncertezaDisparidade.String= sprintf('',handles.incerteza.RotacaoStereo);
 
-% Para exibir os valores da matriz de rotação:
+% Para exibir os valores da matriz de rotação estéreo:
 str_A= sprintf('%8.4f %8.4f %8.4f', handles.paramStereo.matrizR(1,1), handles.paramStereo.matrizR(1,2), handles.paramStereo.matrizR(1,3));
 str_B= sprintf('%8.4f %8.4f %8.4f', handles.paramStereo.matrizR(2,1), handles.paramStereo.matrizR(2,2), handles.paramStereo.matrizR(2,3));
 str_C= sprintf('%8.4f %8.4f %8.4f', handles.paramStereo.matrizR(3,1), handles.paramStereo.matrizR(3,2), handles.paramStereo.matrizR(3,3));
 msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
 handles.outRotacaoStereo.String= msg; %str2mat(msg);
 
-% Para exibir os valores do vetor de translação:
+% Para exibir os valores do vetor de translação estéreo:
 msg= sprintf('%8.2f %8.2f %8.2f', handles.paramStereo.vetorT(1), handles.paramStereo.vetorT(2), handles.paramStereo.vetorT(3));
 handles.outTranslacaoStereo.String= msg;
 
+if ~handles.carregaPontosFromFile
+    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'on';
+end
+
+% Para exibir os valores do vetor de rotação world:
+formato='%15.4f'; 
+str_A= num2str(handles.paramStereo.rotLeftCamWorld(1,:), formato);
+str_B= num2str(handles.paramStereo.rotLeftCamWorld(2,:), formato);
+str_C= num2str(handles.paramStereo.rotLeftCamWorld(3,:), formato );
+msg= sprintf('  %s\n  %s\n  %s\n',str_A, str_B, str_C);
+handles.outRotacaoWorld.String= str2mat(msg);
+
+% Para exibir os valores do vetor de translação world:
+formato='%15.4f'; 
+str= num2str(handles.paramStereo.transLeftCamWorld, formato);
+msg= sprintf('  %s',str);
+handles.outTranslacaoWorld.String= str2mat(msg);
 
 % Update handles structure
 guidata(hObject, handles);
+
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -982,11 +1020,20 @@ if handles.carregaPontosFromFile
 else
     pontos3D= handles.pontos3D_sim;
 end
-    
-[handles.ptoPlanoImagem_left handles.ptoPlanoImagem_right]= fCalculaPontosNoPlanoImagem(pontos3D, ...
-                                                                                        handles.paramStereo, ...                                                                                         
-                                                                                        handles.carregaCalibracaoFromFile, ...
-                                                                                        handles.numSimulacoes);
+
+% Gera a matriz de transformação homogênea da câmera direita com relação ao mundo:
+handles.matrizT_World= [handles.paramStereo.rotLeftCamWorld  handles.paramStereo.transLeftCamWorld'; [0 0 0 1]];   
+
+% Gera a matriz de transformação homogênea da câmera direita com relação ao mundo:
+handles.matrizT_Stereo= [handles.paramStereo.matrizR  handles.paramStereo.vetorT; [0 0 0 1]]; 
+
+% Gera as coordenadas do ponto 3D no plano imagem, ainda em mm, para a scam. esquerda e direita:
+[handles.ptoPlanoImagem_left handles.ptoPlanoImagem_right]= fGeraCoordenadasPlanoImagem(pontos3D, handles.paramStereo, ...
+                                                                                        handles.matrizT_World, ...
+                                                                                        handles.matrizT_Stereo, ... 
+                                                                                        handles.numSimulacoes, ...
+                                                                                        handles.carregaCalibracaoFromFile);
+
 if ~handles.carregaPontosFromFile
     handles.editCoordPontoPlanoImagemLeft.String= sprintf('%4.0f  %4.0f',handles.ptoPlanoImagem_left(1), handles.ptoPlanoImagem_left(2)); 
     handles.editCoordPontoPlanoImagemRight.String= sprintf('%4.0f  %4.0f',handles.ptoPlanoImagem_right(1), handles.ptoPlanoImagem_right(2));
@@ -1267,3 +1314,12 @@ handles.incerteza.ComprimentoFocal_R= [str2double(hObject.String) str2double(hOb
 
 % Update handles structure
 guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function outRotacaoWorld_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to outRotacaoWorld (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+
