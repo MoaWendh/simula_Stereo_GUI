@@ -73,51 +73,61 @@ for ctPt=1:numPontos
     p_right_2D(ctPt,2)= round((p_right_2D_H(2)/p_right_2D_H(3))/pixelSize);
 end
 
-Parei aqui!!!!
-Parece que funcionou, coverificar os parêmtros usados na tringulação 3D no processa_stereo_Lidar_GUI
 
-[X_L, X_R] = fStereoTriangulation(p_left_2D', p_right_2D',  paramStereo.vetorR, paramStereo.vetorT, ... 
-                                  paramStereo.comprimentoFocal_L, sensorOrigin_L,  paramStereo.distorcaoLente_L, paramStereo.skell_L, ...
-                                  paramStereo.comprimentoFocal_R, sensorOrigin_R,  paramStereo.distorcaoLente_R, paramStereo.skell_R);
-close all;
-
-
-plot3(X_R(1,:), X_R(2,:), X_R(3,:), '.r');
-hold on;
-xlabel('X');
-ylabel('Y');
-zlabel('Z');
-axis equal;
-
-plot3(pontos3D(:,1), pontos3D(:,2), pontos3D(:,3), 'ob');
+% distorcaoLente_L= [0 0 0 0 0]';
+% distorcaoLente_R= [0 0 0 0 0]';
+% % Nã há necessiade de colocar adistorção, uma vez que os pontos 3D de entrada já estão com a distorção corrigida. 
+% [X_L, X_R] = fStereoTriangulation(p_left_2D', p_right_2D',  paramStereo.vetorR, paramStereo.vetorT, ... 
+%                                   paramStereo.comprimentoFocal_L, sensorOrigin_L,  distorcaoLente_L, paramStereo.skell_L, ...
+%                                   paramStereo.comprimentoFocal_R, sensorOrigin_R,  distorcaoLente_R, paramStereo.skell_R);
+% close all;
+% 
+% plot3(X_R(1,:), X_R(2,:), X_R(3,:), '.r');
+% hold on;
+% xlabel('X');
+% ylabel('Y');
+% zlabel('Z');
+% axis equal;
+% 
+% plot3(pontos3D(:,1), pontos3D(:,2), pontos3D(:,3), 'ob');
 
 
 close all;
 fig= figure;
 fig.Position= [1117 300 1391 900];  
  
-
+% Plota o ponto na tela como se fosse o plano imagem do sensor, a origem do plano
+% coordenado u e v está no canto superior esquerdo:
 subplot(1,2,1);
-plot(p_left_2D(1), p_left_2D(2), '.r', 'MarkerSize', 15);
+plot(p_left_2D(:,1), p_left_2D(:,2), '.r', 'MarkerSize', 15);
 msgTexto=sprintf('Plano Imagem Esquerdo - disparidade= %d pixels', abs(round(p_left_2D(1,1) - p_right_2D(1,1))));
 title(msgTexto);
 xlabel('X - Pixels');
 ylabel('Y - Pixels');
-% xlim([0 2048]);
-% ylim([0 2048]);
+xlim([0 2047]);
+ylim([0 2047]);
 grid on;
-axis equal;
+% axis equal;
+h1= gca;
+% Inverte o eixo vertical, para colocar a origem do sensor no canto superior esquerdo:
+set(h1,'YDir','reverse');
 
 
+% Plota o ponto na tela como se fosse o plano imagem dos ensor, a origem do plano
+% coordenado u e v está no canto superior esquerdo:
 subplot(1,2,2);
-plot(p_right_2D(1), p_right_2D(2), '.b', 'MarkerSize', 15);
+plot(p_right_2D(:,1), p_right_2D(:,2), '.b', 'MarkerSize', 15);
 msgTexto=sprintf('Plano Imagem Direito - disparidade= %d pixels', abs(round((p_left_2D(1,1) - p_right_2D(1,1)))));
 title(msgTexto);
 xlabel('X - Pixels');
 ylabel('Y - Pixels');
-% xlim([0 2048]);
-% ylim([0 2048]);
+xlim([0 2047]);
+ylim([0 2047]);
 grid on;
-axis equal;
+% axis equal;
+h2= gca;
+% Inverte o eixo vertical, para colocar a origem do sensor no canto superior esquerdo:
+set(h2,'YDir','reverse');
+
 
 end

@@ -1,0 +1,22 @@
+function [M_L, M_R]= fStereoTriangulation_moa(p_left, p_right, ...
+                                              vetorR, t, ... 
+                                              f_L, sensorOrigem_L,  distorcaoLente_L, skell_L, ...
+                                              f_R, sensorOrigem_R,  distorcaoLente_R, skell_R, ...
+                                              X_L, X_R, pixelSize)
+
+xt = normalize_pixel(p_left, f_L, sensorOrigem_L, kc_left,alpha_c_left)
+
+R= fRodrigues(vetorR);
+
+baseLine= sqrt(t(1)^2 + t(2)^2 + t(3)^2);
+
+disparidade= p_left(1) - p_right(1);
+
+z= baseLine*f_L(1)/disparidade;
+
+x= z*p_left(1)/f_L(1);
+
+y= z*p_left(2)/f_L(1);
+
+
+end

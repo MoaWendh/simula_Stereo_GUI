@@ -25,8 +25,6 @@ function [XL,XR] = fStereoTriangulation(xL, xR, om, T, ...
 %
 % (c) Jean-Yves Bouguet - Intel Corporation - April 9th, 2003
 
-
-
 %--- Normalize the image projection according to the intrinsic parameters of the left and right cameras
 xt = normalize_pixel(xL,fc_left,cc_left,kc_left,alpha_c_left);
 xtt = normalize_pixel(xR,fc_right,cc_right,kc_right,alpha_c_right);
@@ -40,7 +38,6 @@ N = size(xt,2);
 
 %--- Rotation matrix corresponding to the rigid motion between left and right cameras:
 R = rodrigues(om);
-
 
 %--- Triangulation of the rays in 3D space:
 
@@ -65,7 +62,6 @@ Ztt = NN2./DD;
 
 X1 = xt .* repmat(Zt,[3 1]);
 X2 = R'*(xtt.*repmat(Ztt,[3,1])  - T_vect);
-
 
 %--- Left coordinates:
 XL = 1/2 * (X1 + X2);
