@@ -16,27 +16,27 @@ sensorOrigin_L= paramStereo.sensorOrigin_L;
 sensorOrigin_R= paramStereo.sensorOrigin_R;
 
 % Origem do sistema de coordenadas do plano sensor:
-x0_L= 1*paramStereo.sensorOrigin_L(1);
-y0_L= 1*paramStereo.sensorOrigin_L(2);
-x0_R= 1*paramStereo.sensorOrigin_R(1);
-y0_R= 1*paramStereo.sensorOrigin_R(2);
+x0_L= 1*paramStereo.sensorOrigin_L(1)*pixelSize;
+y0_L= 1*paramStereo.sensorOrigin_L(2)*pixelSize;
+x0_R= 1*paramStereo.sensorOrigin_R(1)*pixelSize;
+y0_R= 1*paramStereo.sensorOrigin_R(2)*pixelSize;
 
 
 % COmprimento focal em pixels para mm:
-f_L(1)= paramStereo.comprimentoFocal_L(1);
-f_L(2)= paramStereo.comprimentoFocal_L(2);
-f_R(1)= paramStereo.comprimentoFocal_R(1);
-f_R(2)= paramStereo.comprimentoFocal_R(2);
+f_L(1)= paramStereo.comprimentoFocal_L(1)*pixelSize;
+f_L(2)= paramStereo.comprimentoFocal_L(2)*pixelSize;
+f_R(1)= paramStereo.comprimentoFocal_R(1)*pixelSize;
+f_R(2)= paramStereo.comprimentoFocal_R(2)*pixelSize;
 
-% Monta a matriz Intrinseca da câmera esquerda com valores em mm:
-M_Intrinc_L= [f_L(1)*pixelSize       0             x0_L*pixelSize    0;
-                    0          f_L(2)*pixelSize    y0_L*pixelSize    0;
-                    0                0                     1         0];
+% Monta a matriz Intrinseca da câmera esquerda:
+M_Intrinc_L= [f_L(1)      0       x0_L    0;
+               0        f_L(2)    y0_L    0;
+               0          0        1      0];
    
 % % Monta a matriz Intrinseca da câmera direita:
-M_Intrinc_R= [f_R(1)*pixelSize       0             x0_R*pixelSize    0;
-                    0          f_R(2)*pixelSize    y0_R*pixelSize    0;
-                    0                0                     1         0];
+M_Intrinc_R= [f_R(1)      0       x0_R    0;
+               0        f_R(2)    y0_R    0;
+               0          0        1      0];
 
 % Calcula a matriz inversa da câmera esquerda com relação ao mundo:
 matrizT_World_inv= inv(matrizT_World);
@@ -58,33 +58,34 @@ distorcaoLente_R= [0 0 0 0 0]';
 % imagens, elas sevirão para gerar a simulação para cada um desses pontos:
 for ctPt=1:numPontos
     % Gera uma coordenada homogênea para o ponto P. As coordenadas já estão em mm:    
-    P_HC_right_3D=[pontos3D(ctPt,:) 1];
+    P_H0_3D=[pontos3D(ctPt,:) 1];
     
     % Transformar o ponto P com relação ao sistema de coordenadas da câmera direita (Verificar a página 323 do livro do Peter Corke):
-%     P_HC_right_3D= matrizT_World_inv*P_H0_3D'; 
+    P_HC_right_3D= matrizT_World_inv*P_H0_3D'; 
     
-    % Transformar o ponto P com relação ao sistema de coordenadas da câmera esquerda (Verificar a página 323 do livro do Peter Corke).
-    % As coordenadas do ponto 2D "p_left_2D_H" já estão mapeados no sensor:
-    p_left_2D_H= M_Intrinc_L*inv(matrizT_Stereo)*P_HC_right_3D';
+    % Transformar o ponto P com relação ao sistema de coordenadas da câmera esquerda (Verificar a página 323 do livro do Peter Corke):
+    P_HC_left_3D= inv(matrizT_Stereo)*P_HC_right_3D;
+    %P_HC_left_3D= matrizT_Stereo\P_HC_right_3D;
     
+    % Acha as coordenadas no plano imagem esquerdo em mm:
+    p_left_2D_H= M_Intrinc_L*P_HC_left_3D;
     % Converte de homogêneo para cartesiano e em pixel:
     p_left_2D(1)= round((p_left_2D_H(1)/p_left_2D_H(3))/pixelSize);
     p_left_2D(2)= round((p_left_2D_H(2)/p_left_2D_H(3))/pixelSize); 
 
     % Acha as coordenadas no plano imagem direito em mm:
-    p_right_2D_H= M_Intrinc_R*P_HC_right_3D'; 
+    p_right_2D_H= M_Intrinc_R*P_HC_right_3D; 
     % Converte de homogêneo para cartesiano e em pixel: 
     p_right_2D(1)= round((p_right_2D_H(1)/p_right_2D_H(3))/pixelSize);
     p_right_2D(2)= round((p_right_2D_H(2)/p_right_2D_H(3))/pixelSize);
 
-    
     %************* Outra forma de calcular as coordenadas x e y:
     %baseline= -1*sqrt(matrizT_Stereo(1,4)^2 + matrizT_Stereo(2,4)^2 + matrizT_Stereo(3,4)^2);
     baseline= matrizT_Stereo(1,4);
-    X= P_HC_right_3D(1);
-    Y= P_HC_right_3D(2);
-    Z= P_HC_right_3D(3);
-    uL= round((f_L(1)*pixelSize*((X-baseline)/Z) + x0_L*pixelSize)/pixelSize);
+    X= pontos3D(ctPt,1);
+    Y= pontos3D(ctPt,2);
+    Z= pontos3D(ctPt,3);
+    uL= round((f_L(1)*((X-baseline)/Z) + x0_L)/pixelSize);
     vL= round((f_L(2)*(Y/Z) + y0_L)/pixelSize);
     
     uR= round((f_R(1)*((X)/Z) + x0_R)/pixelSize);
@@ -92,34 +93,35 @@ for ctPt=1:numPontos
 
     p_left(ctPt,:)= [uL vL];
     p_right(ctPt,:)= [uR vR];
+%     p_left(ctPt,:)= p_left_2D;
+%     p_right(ctPt,:)= p_right_2D;
     
 % % Nã há necessiade de colocar adistorção, uma vez que os pontos 3D de entrada já estão com a distorção corrigida. 
 [X_LA(:,ctPt), X_RA(:,ctPt)] = fStereoTriangulation_moa(p_left(ctPt,:)', p_right(ctPt,:)',  paramStereo.vetorR, paramStereo.vetorT, ... 
                                   paramStereo.comprimentoFocal_L, sensorOrigin_L,  distorcaoLente_L, paramStereo.skell_L, ...
                                   paramStereo.comprimentoFocal_R, sensorOrigin_R,  distorcaoLente_R, paramStereo.skell_R, ...
-                                  pixelSize, matrizT_Stereo);
+                                  0,0, pixelSize, matrizT_Stereo);
 
 % % Nã há necessiade de colocar adistorção, uma vez que os pontos 3D de entrada já estão com a distorção corrigida. 
 [X_LB(:,ctPt), X_RB(:,ctPt)] = fStereoTriangulation_moa(p_left_2D', p_right_2D',  paramStereo.vetorR, paramStereo.vetorT, ... 
                                   paramStereo.comprimentoFocal_L, sensorOrigin_L,  distorcaoLente_L, paramStereo.skell_L, ...
                                   paramStereo.comprimentoFocal_R, sensorOrigin_R,  distorcaoLente_R, paramStereo.skell_R, ...
-                                  pixelSize, matrizT_Stereo);
+                                  0,0, pixelSize, matrizT_Stereo);
 end
 
 
 close all;
 
-
-plot3(pontos3D(:,1), pontos3D(:,2), pontos3D(:,3), 'or');
+plot3(X_RA(1,:), X_RA(2,:), X_RA(3,:), '.b');
 hold on;
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
 axis equal;
 
-plot3(X_RA(1,:), X_RA(2,:), X_RA(3,:), '.b');
 plot3(X_RB(1,:), X_RB(2,:), X_RB(3,:), '.g');
 
+plot3(pontos3D(:,1), pontos3D(:,2), pontos3D(:,3), 'or');
 
 
 close all;

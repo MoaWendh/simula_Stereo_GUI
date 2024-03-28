@@ -2,21 +2,36 @@ function [M_L, M_R]= fStereoTriangulation_moa(p_left, p_right, ...
                                               vetorR, t, ... 
                                               f_L, sensorOrigem_L,  distorcaoLente_L, skell_L, ...
                                               f_R, sensorOrigem_R,  distorcaoLente_R, skell_R, ...
-                                              X_L, X_R, pixelSize)
+                                              X_L, X_R, pixelSize, matrizT_Stereo)
 
-xt = normalize_pixel(p_left, f_L, sensorOrigem_L, kc_left,alpha_c_left)
+% p_left_n = normalize_pixel(p_left, f_L, sensorOrigem_L, distorcaoLente_L, skell_L);
+% p_right_n = normalize_pixel(p_right, f_R, sensorOrigem_R, distorcaoLente_R, skell_R);
 
 R= fRodrigues(vetorR);
 
 baseLine= sqrt(t(1)^2 + t(2)^2 + t(3)^2);
 
+baseLine= t(1);
+
 disparidade= p_left(1) - p_right(1);
 
-z= baseLine*f_L(1)/disparidade;
+Z_L= f_L(1)*(baseLine/disparidade);
+X_L= (baseLine*(p_left(1)-sensorOrigem_L(1))/disparidade);
+Y_L= (baseLine*(p_left(2)-sensorOrigem_L(2))/disparidade)*(f_L(1)/f_L(2));
 
-x= z*p_left(1)/f_L(1);
+P_L=[X_L  Y_L  Z_L  1]';
 
-y= z*p_left(2)/f_L(1);
+P_R_B= (matrizT_Stereo)\P_L;
 
+
+disparidade= p_right(1)-p_left(1);
+
+Z_R= f_R(1)*(baseLine/disparidade);
+X_R= (baseLine*(p_right(1)-sensorOrigem_R(1))/disparidade);
+Y_R= (baseLine*(p_right(2)-sensorOrigem_R(2))/disparidade)*(f_R(1)/f_R(2));
+
+P_R= [X_R  Y_R   Z_R ]';
+
+P_L_B= matrizT_Stereo*P_R;
 
 end
