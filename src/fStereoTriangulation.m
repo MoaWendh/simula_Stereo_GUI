@@ -69,3 +69,4 @@ XL = 1/2 * (X1 + X2);
 %--- Right coordinates:
 XR = R*XL + T_vect;
 
+end

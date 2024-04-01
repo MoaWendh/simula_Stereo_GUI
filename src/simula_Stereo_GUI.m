@@ -1034,25 +1034,14 @@ handles.matrizT_Stereo= [handles.paramStereo.matrizR  handles.paramStereo.vetorT
                                                                                         handles.matrizT_Stereo, ... 
                                                                                         handles.numSimulacoes, ...
                                                                                         handles.carregaCalibracaoFromFile);
-
+                                                                                   
 if ~handles.carregaPontosFromFile
     handles.editCoordPontoPlanoImagemLeft.String= sprintf('%4.0f  %4.0f',handles.ptoPlanoImagem_left(1), handles.ptoPlanoImagem_left(2)); 
     handles.editCoordPontoPlanoImagemRight.String= sprintf('%4.0f  %4.0f',handles.ptoPlanoImagem_right(1), handles.ptoPlanoImagem_right(2));
 else
     handles.editCoordPontoPlanoImagemLeft.String= '?';
     handles.editCoordPontoPlanoImagemRight.String= '?';
-end
-
-% if (handles.ptoPlanoImagem_left(1)>1024 || handles.ptoPlanoImagem_left(1)<-1024  || ... 
-%     handles.ptoPlanoImagem_left(2)>1024 || handles.ptoPlanoImagem_left(2)<-1024 || ...
-%     handles.ptoPlanoImagem_right(1)>1024 || handles.ptoPlanoImagem_right(1)<-1024 || ...
-%     handles.ptoPlanoImagem_right(2)>1024 || handles.ptoPlanoImagem_right(2)<-1024)
-% 
-%     msg= sprintf('As coordenadas do ponto P 3D estão fora do campo de visão do sistema estéreo!');
-%     msgbox(msg, 'Atenção!', 'warn');
-%     return;
-% end
-                                                                
+end                                                    
      
 handles.pbSimulaIncertezaStereo.Enable= 'on';
 
