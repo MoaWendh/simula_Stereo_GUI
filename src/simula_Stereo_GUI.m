@@ -22,7 +22,7 @@ function varargout = simula_Stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help simula_Stereo_GUI
 
-% Last Modified by GUIDE v2.5 02-Apr-2024 19:56:27
+% Last Modified by GUIDE v2.5 03-Apr-2024 11:29:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,6 +56,8 @@ function simula_Stereo_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % Definição de alguns nomes de folder para sereme gerados:
 handles.pathBase= 'C:\Projetos\Matlab\programas_GUI\simula_Stereo_GUI\src\in';
 handles.pathCalibrationFile= 'D:\Moacir\ensaios\Calibracao\vigente\estereo\bouguet';
+
+handles.ArquivoCalibracaoOk= 0;
 
 % Choose default command line output for simula_Stereo_GUI
 handles.output = hObject;
@@ -117,9 +119,9 @@ close all;
 clear;
 
 
-% --- Executes on button press in pbSimulaIncertezaStereo.
-function pbSimulaIncertezaStereo_Callback(hObject, eventdata, handles)
-% hObject    handle to pbSimulaIncertezaStereo (see GCBO)
+% --- Executes on button press in pbSimulaPontos3D.
+function pbSimulaPontos3D_Callback(hObject, eventdata, handles)
+% hObject    handle to pbSimulaPontos3D (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -130,11 +132,13 @@ else
 end
 
 
-handles.resultadoSimulacao= fSimulaIncertezaStereo(handles.ptoPlanoImagem_left, handles.ptoPlanoImagem_right, ...
+[handles.X_L_sim handles.X_R_sim]= fSimulaIncertezaStereo(handles.ptoPlanoImagem_left, handles.ptoPlanoImagem_right, ...
                                                    pontos3D, handles.paramStereo, handles.incerteza, ...
                                                    handles.carregaCalibracaoFromFile, handles.numSimulacoes, ...
                                                    handles.HabShowPontos3D);
 
+handles.pbAnalisaIncertezas.Enable= 'on';                                               
+                                               
 % Update handles structure
 guidata(hObject, handles);
 
@@ -336,7 +340,8 @@ function editCoordenadasXYZ_Callback(hObject, eventdata, handles)
 
 handles.pontos3D_sim= str2num(hObject.String);
 
-handles.pbSimulaIncertezaStereo.Enable= 'off';
+handles.pbSimulaPontos3D.Enable= 'off';
+handles.pbAnalisaIncertezas.Enable= 'off'; 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -760,13 +765,20 @@ function rdCarregaArquivoPtos3D_Callback(hObject, eventdata, handles)
 if hObject.Value
     handles.pbLoadPontos3D.Enable= 'on';
     handles.editCoordenadasXYZ.Enable= 'off';
+    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'off';
+    handles.editIncrementoDistancia.Enable= 'off';
+    handles.editDistanciaMaxima.Enable= 'off';        
 else
     handles.pbLoadPontos3D.Enable= 'off';
     handles.editCoordenadasXYZ.Enable= 'on';
+    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'on';   
+    handles.editIncrementoDistancia.Enable= 'on';
+    handles.editDistanciaMaxima.Enable= 'on';    
 end
 
 handles.carregaPontosFromFile= hObject.Value;
-handles.pbSimulaIncertezaStereo.Enable= 'off';
+handles.pbSimulaPontos3D.Enable= 'off';
+handles.pbAnalisaIncertezas.Enable= 'off'; 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -876,7 +888,8 @@ handles.outTranslacaoWorld.String= str2mat(msg);
 
 handles.carregaCalibracaoFromFile= hObject.Value;
 
-handles.pbSimulaIncertezaStereo.Enable= 'off';
+handles.pbSimulaPontos3D.Enable= 'off';
+handles.pbAnalisaIncertezas.Enable= 'off'; 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -983,6 +996,8 @@ str= num2str(handles.paramStereo.transLeftCamWorld, formato);
 msg= sprintf('  %s',str);
 handles.outTranslacaoWorld.String= str2mat(msg);
 
+handles.ArquivoCalibracaoOk= 1;
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -1018,7 +1033,7 @@ function pbCalaculaPontosNoPlanoImagem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-if handles.carregaPontosFromFile
+if handles.carregaPontosFromFile && handles.ArquivoCalibracaoOk
     pontos3D= handles.pontos3D_real;
 else
     pontos3D= handles.pontos3D_sim;
@@ -1031,71 +1046,20 @@ handles.matrizT_World= [handles.paramStereo.rotLeftCamWorld  handles.paramStereo
 handles.matrizT_Stereo= [handles.paramStereo.matrizR  handles.paramStereo.vetorT; [0 0 0 1]]; 
 
 % Gera as coordenadas do ponto 3D no plano imagem, ainda em mm, para a scam. esquerda e direita:
-[handles.ptoPlanoImagem_left handles.ptoPlanoImagem_right]= fGeraCoordenadasPlanoImagem(pontos3D, handles.paramStereo, ...
+[handles.ptoPlanoImagem_left handles.ptoPlanoImagem_right handles.distanciaNominal]= fGeraCoordenadasPlanoImagem(pontos3D, handles.paramStereo, ...
                                                                                         handles.matrizT_World, ...
                                                                                         handles.matrizT_Stereo, ... 
                                                                                         handles.numSimulacoes, ...
-                                                                                        handles.carregaCalibracaoFromFile, ...
-                                                                                        handles.HabShowPontosPlanoImagem);
-                                                                                   
-if ~handles.carregaPontosFromFile
-    handles.editCoordPontoPlanoImagemLeft.String= sprintf('%4.0f  %4.0f',handles.ptoPlanoImagem_left(1), handles.ptoPlanoImagem_left(2)); 
-    handles.editCoordPontoPlanoImagemRight.String= sprintf('%4.0f  %4.0f',handles.ptoPlanoImagem_right(1), handles.ptoPlanoImagem_right(2));
-else
-    handles.editCoordPontoPlanoImagemLeft.String= '?';
-    handles.editCoordPontoPlanoImagemRight.String= '?';
-end                                                    
+                                                                                        handles.carregaPontosFromFile, ...
+                                                                                        handles.HabShowPontosPlanoImagem, ...
+                                                                                        handles.HabilitaIncrementoDistancia, ...
+                                                                                        handles.IncrementoDistancia, ...
+                                                                                        handles.DistanciaMaximaSim);                                            
      
-handles.pbSimulaIncertezaStereo.Enable= 'on';
+handles.pbSimulaPontos3D.Enable= 'on';
 
 % Update handles structure
 guidata(hObject, handles);
-
-
-
-function editCoordPontoPlanoImagemLeft_Callback(hObject, eventdata, handles)
-% hObject    handle to editCoordPontoPlanoImagemLeft (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of editCoordPontoPlanoImagemLeft as text
-%        str2double(get(hObject,'String')) returns contents of editCoordPontoPlanoImagemLeft as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function editCoordPontoPlanoImagemLeft_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editCoordPontoPlanoImagemLeft (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function editCoordPontoPlanoImagemRight_Callback(hObject, eventdata, handles)
-% hObject    handle to editCoordPontoPlanoImagemRight (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of editCoordPontoPlanoImagemRight as text
-%        str2double(get(hObject,'String')) returns contents of editCoordPontoPlanoImagemRight as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function editCoordPontoPlanoImagemRight_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to editCoordPontoPlanoImagemRight (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 
 
@@ -1108,6 +1072,8 @@ function editNumeroDeSimulacoes_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of editNumeroDeSimulacoes as a double
 
 handles.numSimulacoes= str2num(hObject.String);
+
+handles.pbAnalisaIncertezas.Enable= 'off';
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1368,6 +1334,125 @@ function rdExibePontosPanoImagem_CreateFcn(hObject, eventdata, handles)
 
 
 handles.HabShowPontosPlanoImagem= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes on button press in pbAnalisaIncertezas.
+function pbAnalisaIncertezas_Callback(hObject, eventdata, handles)
+% hObject    handle to pbAnalisaIncertezas (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+handles.resultadoSimulacao= fAnalisaIncertezas(handles.X_L_sim, handles.X_R_sim, handles.numSimulacoes, handles.distanciaNominal);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+function editIncrementoDistancia_Callback(hObject, eventdata, handles)
+% hObject    handle to editIncrementoDistancia (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editIncrementoDistancia as text
+%        str2double(get(hObject,'String')) returns contents of editIncrementoDistancia as a double
+
+handles.IncrementoDistancia= str2num(hObject.String);
+
+
+handles.pbSimulaPontos3D.Enable= 'off';
+handles.pbAnalisaIncertezas.Enable= 'off';  
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editIncrementoDistancia_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editIncrementoDistancia (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.IncrementoDistancia= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+function editDistanciaMaxima_Callback(hObject, eventdata, handles)
+% hObject    handle to editDistanciaMaxima (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of editDistanciaMaxima as text
+%        str2double(get(hObject,'String')) returns contents of editDistanciaMaxima as a double
+
+handles.DistanciaMaximaSim= str2num(hObject.String);
+
+handles.pbSimulaPontos3D.Enable= 'off';
+handles.pbAnalisaIncertezas.Enable= 'off';
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function editDistanciaMaxima_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editDistanciaMaxima (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+handles.DistanciaMaximaSim= str2num(hObject.String);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes on button press in rdSimulaPontoComIncrementoDaDistancia.
+function rdSimulaPontoComIncrementoDaDistancia_Callback(hObject, eventdata, handles)
+% hObject    handle to rdSimulaPontoComIncrementoDaDistancia (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rdSimulaPontoComIncrementoDaDistancia
+if hObject.Value
+    handles.editIncrementoDistancia.Enable= 'on';
+    handles.editDistanciaMaxima.Enable= 'on';
+else
+    handles.editIncrementoDistancia.Enable= 'off';
+    handles.editDistanciaMaxima.Enable= 'off';    
+end
+
+handles.HabilitaIncrementoDistancia= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+
+% --- Executes during object creation, after setting all properties.
+function rdSimulaPontoComIncrementoDaDistancia_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to rdSimulaPontoComIncrementoDaDistancia (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+handles.HabilitaIncrementoDistancia= hObject.Value;
 
 % Update handles structure
 guidata(hObject, handles);

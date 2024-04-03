@@ -1,9 +1,12 @@
-function [p_left_2D p_right_2D]= fGeraCoordenadasPlanoImagem(pontos3D, paramStereo, ...
+function [p_left_2D p_right_2D distanciaNominal]= fGeraCoordenadasPlanoImagem(pontos3D, paramStereo, ...
                                                              matrizT_World, ...
                                                              matrizT_Stereo, ... 
                                                              numSimulacoes, ...
-                                                             carregaCalibracaoFromFile, ...
-                                                             HabShowPontosPlanoImagem)
+                                                             carregaPontosFromFile, ...
+                                                             HabShowPontosPlanoImagem, ...
+                                                             HabilitaIncrementoDistancia, ...
+                                                             IncrementoDistancia, ...
+                                                             DistanciaMaximaSim)
 clc;
 
 % Extraindo os parâmetros par varáveis locais: 
@@ -33,7 +36,7 @@ f_R(2)= paramStereo.comprimentoFocal_R(2);
 M_Intrinc_L= [f_L(1)*pixelSize       0             u0_L*pixelSize    0;
                     0          f_L(2)*pixelSize    v0_L*pixelSize    0;
                     0                0                     1         0];
-   
+
 % % Monta a matriz Intrinseca da câmera direita:
 M_Intrinc_R= [f_R(1)*pixelSize       0             u0_R*pixelSize    0;
                     0          f_R(2)*pixelSize    v0_R*pixelSize    0;
@@ -45,52 +48,64 @@ matrizT_World_inv= inv(matrizT_World);
 % Matriz estéreo neutra para testes:
 % matrizT_Stereo= [eye(4,3) [-500 0 0 1]']
 
-% Define o número de pontos para simulação:
-[numPontos numCoords]= size(pontos3D);
+if ~carregaPontosFromFile
+    % Define o número de pontos para simulação:
+    [numPontos numCoords]= size(pontos3D);
 
-% Atenbção, como os pontos 3D carregados de arquivo já estão com a
-% distorção corrigida, não pe necessário repassar as distorção para a
-% tringulação:
-distorcaoLente_L= [0 0 0 0 0]';
-distorcaoLente_R= [0 0 0 0 0]';
+    % Atenbção, como os pontos 3D carregados de arquivo já estão com a 
+    % corrigida, não pe necessário repassar as distorção para a tringulação:
+    distorcaoLente_L= [0 0 0 0 0]';
+    distorcaoLente_R= [0 0 0 0 0]';
+    
+    % adiciona-se 1 para chegar à distãncia máxima, pois a primeir iteração não é adicionado o incremento:
+    distanciaInicial= pontos3D(3);
+    numDistancias= ceil((DistanciaMaximaSim- distanciaInicial)/IncrementoDistancia) + 1;
+    
+    pontos3D_aux= pontos3D;
+    
+    % Para cada ponto de entrada é encontrado a sua projeção nos planos imagens
+    % equerdo e direito. Apenas depois de conhecidas as coordenadas dos planos
+    % imagens, elas sevirão para gerar a simulação para cada um desses pontos:
+    for ctDist=1:numDistancias
+        if ctDist>1 
+            pontos3D_aux(ctDist,1)= pontos3D_aux(ctDist-1,1);   
+            pontos3D_aux(ctDist,2)= pontos3D_aux(ctDist-1,2);
+            pontos3D_aux(ctDist,3)= pontos3D_aux(ctDist-1,3) + IncrementoDistancia;            
+        end 
+        % Gera uma coordenada homogênea para o ponto P no espaço 3D. As coordenadas já estão em mm:    
+        P_HC_right_3D=[pontos3D_aux(ctDist,:) 1];
 
-% Para cada ponto de entrada é encontrado a sua projeção nos planos imagens
-% equerdo e direito. Apenas depois de conhecidas as coordenadas dos planos
-% imagens, elas sevirão para gerar a simulação para cada um desses pontos:
-for ctPt=1:numPontos
-    % Gera uma coordenada homogênea para o ponto P no espaço 3D. As coordenadas já estão em mm:    
-    P_HC_right_3D=[pontos3D(ctPt,:) 1];
-       
-    % Transformar o ponto P com relação ao sistema de coordenadas da câmera esquerda 
-    % (Verificar a página 323 do livro do Peter Corke). A Matriz de projeção M da câmera 
-    % esquerda é calculada por:
-    M= M_Intrinc_L*inv(matrizT_Stereo);
-    
-    % As coordenadas homogêneas do ponto mapeado no sistema de referência da cãmera esquerda é
-    % determinado usando a matriz M e o ponto P com relaçãop a câmera direita:
-    p_left_2D_H= M*P_HC_right_3D';
-    xL= p_left_2D_H(1);
-    yL= p_left_2D_H(2);
-    wL= p_left_2D_H(3);
-    
-    % Converte de homogêneo para cartesiano e em pixel com relação ao sensor de imagem da câmera esquerda:
-    uL(ctPt)= ((xL/wL)/pixelSize);
-    vL(ctPt)= ((yL/wL)/pixelSize); 
+        % Transformar o ponto P com relação ao sistema de coordenadas da câmera esquerda 
+        % (Verificar a página 323 do livro do Peter Corke). A Matriz de projeção M da câmera 
+        % esquerda é calculada por:
+        M= M_Intrinc_L*inv(matrizT_Stereo);
 
-    % As coordenadas homogêneas do ponto mapeado no sistema de referência da cãmera direita é:
-    p_right_2D_H= M_Intrinc_R*P_HC_right_3D'; 
-    xR= p_right_2D_H(1);
-    yR= p_right_2D_H(2);
-    wR= p_right_2D_H(3);
-    
-    % Converte de homogêneo para cartesiano e em pixel com relação ao sensor de imagem da câmera direita:
-    uR(ctPt)= ((xR/wR)/pixelSize);
-    vR(ctPt)= ((yR/wR)/pixelSize);
-    
+        % As coordenadas homogêneas do ponto mapeado no sistema de referência da cãmera esquerda é
+        % determinado usando a matriz M e o ponto P com relaçãop a câmera direita:
+        p_left_2D_H= M*P_HC_right_3D';
+        xL= p_left_2D_H(1);
+        yL= p_left_2D_H(2);
+        wL= p_left_2D_H(3);
+
+        % Converte de homogêneo para cartesiano e em pixel com relação ao sensor de imagem da câmera esquerda:
+        uL(ctDist)= ((xL/wL)/pixelSize);
+        vL(ctDist)= ((yL/wL)/pixelSize); 
+
+        % As coordenadas homogêneas do ponto mapeado no sistema de referência da cãmera direita é:
+        p_right_2D_H= M_Intrinc_R*P_HC_right_3D'; 
+        xR= p_right_2D_H(1);
+        yR= p_right_2D_H(2);
+        wR= p_right_2D_H(3);
+
+        % Converte de homogêneo para cartesiano e em pixel com relação ao sensor de imagem da câmera direita:
+        uR(ctDist)= ((xR/wR)/pixelSize);
+        vR(ctDist)= ((yR/wR)/pixelSize);
+    end
 end
 
 p_left_2D= [uL; vL];
 p_right_2D= [uR; vR];                                  
+distanciaNominal= pontos3D_aux(:,3);
 
 if HabShowPontosPlanoImagem
     close all;

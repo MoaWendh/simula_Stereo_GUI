@@ -22,7 +22,7 @@ function varargout = simula_Stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help simula_Stereo_GUI
 
-% Last Modified by GUIDE v2.5 02-Apr-2024 19:56:27
+% Last Modified by GUIDE v2.5 03-Apr-2024 10:03:21
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,6 +56,8 @@ function simula_Stereo_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % Definição de alguns nomes de folder para sereme gerados:
 handles.pathBase= 'C:\Projetos\Matlab\programas_GUI\simula_Stereo_GUI\src\in';
 handles.pathCalibrationFile= 'D:\Moacir\ensaios\Calibracao\vigente\estereo\bouguet';
+
+handles.ArquivoCalibracaoOk= 0;
 
 % Choose default command line output for simula_Stereo_GUI
 handles.output = hObject;
@@ -117,9 +119,9 @@ close all;
 clear;
 
 
-% --- Executes on button press in pbSimulaIncertezaStereo.
-function pbSimulaIncertezaStereo_Callback(hObject, eventdata, handles)
-% hObject    handle to pbSimulaIncertezaStereo (see GCBO)
+% --- Executes on button press in pbSimulaPontos3D.
+function pbSimulaPontos3D_Callback(hObject, eventdata, handles)
+% hObject    handle to pbSimulaPontos3D (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -130,11 +132,13 @@ else
 end
 
 
-handles.resultadoSimulacao= fSimulaIncertezaStereo(handles.ptoPlanoImagem_left, handles.ptoPlanoImagem_right, ...
+[handles.X_L_sim handles.X_R_sim]= fSimulaIncertezaStereo(handles.ptoPlanoImagem_left, handles.ptoPlanoImagem_right, ...
                                                    pontos3D, handles.paramStereo, handles.incerteza, ...
                                                    handles.carregaCalibracaoFromFile, handles.numSimulacoes, ...
                                                    handles.HabShowPontos3D);
 
+handles.pbAnalisaIncertezas.Enable= 'on';                                               
+                                               
 % Update handles structure
 guidata(hObject, handles);
 
@@ -336,7 +340,8 @@ function editCoordenadasXYZ_Callback(hObject, eventdata, handles)
 
 handles.pontos3D_sim= str2num(hObject.String);
 
-handles.pbSimulaIncertezaStereo.Enable= 'off';
+handles.pbSimulaPontos3D.Enable= 'off';
+handles.pbAnalisaIncertezas.Enable= 'off'; 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -760,13 +765,16 @@ function rdCarregaArquivoPtos3D_Callback(hObject, eventdata, handles)
 if hObject.Value
     handles.pbLoadPontos3D.Enable= 'on';
     handles.editCoordenadasXYZ.Enable= 'off';
+    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'off';
 else
     handles.pbLoadPontos3D.Enable= 'off';
     handles.editCoordenadasXYZ.Enable= 'on';
+    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'on';    
 end
 
 handles.carregaPontosFromFile= hObject.Value;
-handles.pbSimulaIncertezaStereo.Enable= 'off';
+handles.pbSimulaPontos3D.Enable= 'off';
+handles.pbAnalisaIncertezas.Enable= 'off'; 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -809,7 +817,7 @@ function rdLoadParamsCalibracao_Callback(hObject, eventdata, handles)
 
 if hObject.Value
     handles.pbLoadParametrosCalibracao.Enable= 'on';
-    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'off';
+    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'on';    
     handles.editRotacaoStereo.Enable= 'off';    
     handles.editTranslacaoStereo.Enable= 'off'; 
     handles.editComprimentoFocal_L.Enable= 'off'; 
@@ -876,7 +884,8 @@ handles.outTranslacaoWorld.String= str2mat(msg);
 
 handles.carregaCalibracaoFromFile= hObject.Value;
 
-handles.pbSimulaIncertezaStereo.Enable= 'off';
+handles.pbSimulaPontos3D.Enable= 'off';
+handles.pbAnalisaIncertezas.Enable= 'off'; 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -940,11 +949,8 @@ handles.incerteza.ComprimentoFocal_R= paramCalib.incerteza_ComprimentoFocal_R;
 handles.incerteza.RotacaoStereo= paramCalib.incerteza_RotStereo;
 
 % Carrega a incerteza na translação entre uma câmera e outra a partir da calibração:
-handles.incerteza.TranslacaoStereo= sqrt(paramCalib.incerteza_Translacao(1)^2 + ...
-                                         paramCalib.incerteza_Translacao(2)^2 + ...
-                                         paramCalib.incerteza_Translacao(3)^2) ;
-                                    
-                                                                        
+handles.incerteza.TranslacaoStereo= paramCalib.incerteza_Translacao;
+                                                                                                       
 % ********************** Atualiza algunsparêmtros no painel GUI  **********************
 handles.editIncertezaComprimentoFocal_L.String= sprintf('%4.4f', handles.incerteza.ComprimentoFocal_L(1)*handles.paramStereo.pixelSize);
 handles.editIncertezaComprimentoFocal_R.String= sprintf('%4.4f', handles.incerteza.ComprimentoFocal_R(1)*handles.paramStereo.pixelSize);
@@ -986,6 +992,8 @@ str= num2str(handles.paramStereo.transLeftCamWorld, formato);
 msg= sprintf('  %s',str);
 handles.outTranslacaoWorld.String= str2mat(msg);
 
+handles.ArquivoCalibracaoOk= 1;
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -1021,7 +1029,7 @@ function pbCalaculaPontosNoPlanoImagem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-if handles.carregaPontosFromFile
+if handles.carregaPontosFromFile && handles.ArquivoCalibracaoOk
     pontos3D= handles.pontos3D_real;
 else
     pontos3D= handles.pontos3D_sim;
@@ -1049,7 +1057,7 @@ else
     handles.editCoordPontoPlanoImagemRight.String= '?';
 end                                                    
      
-handles.pbSimulaIncertezaStereo.Enable= 'on';
+handles.pbSimulaPontos3D.Enable= 'on';
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1111,6 +1119,7 @@ function editNumeroDeSimulacoes_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of editNumeroDeSimulacoes as a double
 
 handles.numSimulacoes= str2num(hObject.String);
+
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1374,3 +1383,17 @@ handles.HabShowPontosPlanoImagem= hObject.Value;
 
 % Update handles structure
 guidata(hObject, handles);
+
+
+% --- Executes on button press in pbAnalisaIncertezas.
+function pbAnalisaIncertezas_Callback(hObject, eventdata, handles)
+% hObject    handle to pbAnalisaIncertezas (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+handles.resultadoSimulacao= fAnalisaIncertezas(handles.X_L_sim, handles.X_R_sim);
+
+% Update handles structure
+guidata(hObject, handles);
+
+
