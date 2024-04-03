@@ -2,8 +2,7 @@ function [p_left_2D p_right_2D]= fGeraCoordenadasPlanoImagem(pontos3D, paramSter
                                                              matrizT_World, ...
                                                              matrizT_Stereo, ... 
                                                              numSimulacoes, ...
-                                                             carregaCalibracaoFromFile, ...
-                                                             HabShowPontosPlanoImagem)
+                                                             carregaCalibracaoFromFile)
 clc;
 
 % Extraindo os parâmetros par varáveis locais: 
@@ -74,8 +73,8 @@ for ctPt=1:numPontos
     wL= p_left_2D_H(3);
     
     % Converte de homogêneo para cartesiano e em pixel com relação ao sensor de imagem da câmera esquerda:
-    uL(ctPt)= ((xL/wL)/pixelSize);
-    vL(ctPt)= ((yL/wL)/pixelSize); 
+    uL(ctPt)= round((xL/wL)/pixelSize);
+    vL(ctPt)= round((yL/wL)/pixelSize); 
 
     % As coordenadas homogêneas do ponto mapeado no sistema de referência da cãmera direita é:
     p_right_2D_H= M_Intrinc_R*P_HC_right_3D'; 
@@ -84,52 +83,106 @@ for ctPt=1:numPontos
     wR= p_right_2D_H(3);
     
     % Converte de homogêneo para cartesiano e em pixel com relação ao sensor de imagem da câmera direita:
-    uR(ctPt)= ((xR/wR)/pixelSize);
-    vR(ctPt)= ((yR/wR)/pixelSize);
+    uR(ctPt)= round((xR/wR)/pixelSize);
+    vR(ctPt)= round((yR/wR)/pixelSize);
+    
+    T= paramStereo.vetorT/1000;
+    ML= [paramStereo.matrizR T; [0 0 0 1]];
+    
+    camL= CentralCamera('name', 'Cam Left', 'default');
+    camL.f= f_L(1)*pixelSize*(1E-3);
+    camL.pp= [u0_L v0_L]';
+    camL.T= ML;
+    camL.rho= [paramStereo.pixelSize*(1E-3) paramStereo.pixelSize*(1E-3)]';
+    camL.npix= paramStereo.sensorSize';
+ 
+    MR= matrizT_World;
+    camR= CentralCamera('name', 'Cam Right', 'default');
+    camR.f= f_R(1)*pixelSize*(1E-3);
+    camR.pp= [u0_R v0_R]';
+    camR.T= MR;
+    camR.rho= [paramStereo.pixelSize*(1E-3) paramStereo.pixelSize*(1E-3)]';
+    camR.npix= paramStereo.sensorSize';
+    
+%     axis([-1 1 -1 1 0 1]);
+%     close all;
+%     camR.plot_camera('color', 'r', 'scale', 0.2, 'label');
+%     camL.plot_camera('color', 'b', 'scale', 0.2, 'label');
+    pt3D= pontos3D(ctPt,:)/1000;    
+    pL(:,ctPt)= camL.plot(pt3D');
+    pR(:,ctPt)= camR.plot(pt3D');
+    
+%     pL(:,ctPt)= [uL vL]';
+%     pR(:,ctPt)= [uR vR]';
     
 end
 
-p_left_2D= [uL; vL];
-p_right_2D= [uR; vR];                                  
 
-if HabShowPontosPlanoImagem
-    close all;
-    fig= figure;
-    fig.Position= [1117 300 1391 900];  
-
-    % Plota o ponto na tela como se fosse o plano imagem do sensor, a origem do plano
-    % coordenado u e v está no canto superior esquerdo:
-    subplot(1,2,1);
-    plot(uL, vL, '.r', 'MarkerSize', 15);
-    msgTexto=sprintf('Plano Imagem Esquerdo.');
-    title(msgTexto);
-    xlabel('X - Pixels');
-    ylabel('Y - Pixels');
-    xlim([0 2047]);
-    ylim([0 2047]);
-    grid on;
-    % axis equal;
-
-    h1= gca;
-    % Inverte o eixo vertical, para colocar a origem do sensor no canto superior esquerdo:
-    set(h1,'YDir','reverse');
+[X_L_aux, X_R_aux] = fStereoTriangulation(pL(:,:), ...
+                                          pR(:,:), ...
+                                          paramStereo.vetorR, paramStereo.vetorT, ... 
+                                          f_L, [u0_L; v0_L],  distorcaoLente_L, paramStereo.skell_L, ...
+                                          f_R, [u0_R; v0_R],  distorcaoLente_R, paramStereo.skell_R);
 
 
-    % Plota o ponto na tela como se fosse o plano imagem dos ensor, a origem do plano
-    % coordenado u e v está no canto superior esquerdo:
-    subplot(1,2,2);
-    plot(uR, vR, '.b', 'MarkerSize', 15);
-    msgTexto=sprintf('Plano Imagem Direito.');
-    title(msgTexto);
-    xlabel('X - Pixels');
-    ylabel('Y - Pixels');
-    xlim([0 2047]);
-    ylim([0 2047]);
-    grid on;
-    % axis equal;
-    h2= gca;
-    % Inverte o eixo vertical, para colocar a origem do sensor no canto superior esquerdo:
-    set(h2,'YDir','reverse');
+close all;
+
+        plot3(pontos3D(:,1), pontos3D(:,2), pontos3D(:,3), 'or');
+        hold on;
+        axis equal;
+        xlabel('X');
+        ylabel('Y');
+        zlabel('Z'); 
+        axis equal;
+        plot3(X_R_aux(1,:), X_R_aux(2,:), X_R_aux(3,:), '.b');            
+    else
+        plot3(X_R_aux(1,:), X_R_aux(2,:), X_R_aux(3,:), '.b');
+    end
 end
+                                  
+                                      
+                                      
+close all;
+fig= figure;
+fig.Position= [1117 300 1391 900];  
+ 
+% Plota o ponto na tela como se fosse o plano imagem do sensor, a origem do plano
+% coordenado u e v está no canto superior esquerdo:
+subplot(1,2,1);
+plot(uL, vL, '.r', 'MarkerSize', 15);
+msgTexto=sprintf('Plano Imagem Esquerdo.');
+title(msgTexto);
+xlabel('X - Pixels');
+ylabel('Y - Pixels');
+xlim([0 2047]);
+ylim([0 2047]);
+grid on;
+% axis equal;
 
+h1= gca;
+% Inverte o eixo vertical, para colocar a origem do sensor no canto superior esquerdo:
+set(h1,'YDir','reverse');
+
+
+% Plota o ponto na tela como se fosse o plano imagem dos ensor, a origem do plano
+% coordenado u e v está no canto superior esquerdo:
+subplot(1,2,2);
+plot(uR, vR, '.b', 'MarkerSize', 15);
+msgTexto=sprintf('Plano Imagem Direito.');
+title(msgTexto);
+xlabel('X - Pixels');
+ylabel('Y - Pixels');
+xlim([0 2047]);
+ylim([0 2047]);
+grid on;
+% axis equal;
+h2= gca;
+% Inverte o eixo vertical, para colocar a origem do sensor no canto superior esquerdo:
+set(h2,'YDir','reverse');
+
+% p_left_2D=[uL; vL];
+% p_right_2D=[uR; vR];
+
+p_left_2D= round(pL);
+p_right_2D= round(pR);
 end

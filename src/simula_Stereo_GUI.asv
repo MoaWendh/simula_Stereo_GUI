@@ -809,7 +809,7 @@ function rdLoadParamsCalibracao_Callback(hObject, eventdata, handles)
 
 if hObject.Value
     handles.pbLoadParametrosCalibracao.Enable= 'on';
-    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'on';    
+    handles.pbCalaculaPontosNoPlanoImagem.Enable= 'off';
     handles.editRotacaoStereo.Enable= 'off';    
     handles.editTranslacaoStereo.Enable= 'off'; 
     handles.editComprimentoFocal_L.Enable= 'off'; 
@@ -940,8 +940,11 @@ handles.incerteza.ComprimentoFocal_R= paramCalib.incerteza_ComprimentoFocal_R;
 handles.incerteza.RotacaoStereo= paramCalib.incerteza_RotStereo;
 
 % Carrega a incerteza na translação entre uma câmera e outra a partir da calibração:
-handles.incerteza.TranslacaoStereo= paramCalib.incerteza_Translacao;
-                                                                                                       
+handles.incerteza.TranslacaoStereo= sqrt(paramCalib.incerteza_Translacao(1)^2 + ...
+                                         paramCalib.incerteza_Translacao(2)^2 + ...
+                                         paramCalib.incerteza_Translacao(3)^2) ;
+                                    
+                                                                        
 % ********************** Atualiza algunsparêmtros no painel GUI  **********************
 handles.editIncertezaComprimentoFocal_L.String= sprintf('%4.4f', handles.incerteza.ComprimentoFocal_L(1)*handles.paramStereo.pixelSize);
 handles.editIncertezaComprimentoFocal_R.String= sprintf('%4.4f', handles.incerteza.ComprimentoFocal_R(1)*handles.paramStereo.pixelSize);
