@@ -104,9 +104,6 @@ if ~carregaPontosFromFile
         uR(ctDist)= ((xR/wR)/pixelSize);
         vR(ctDist)= ((yR/wR)/pixelSize);
     end
-    p_left_2D= [uL; vL];
-    p_right_2D= [uR; vR]; 
-    distanciaNominal= pontos3D_aux(:,3);
 else
     % Neste caso utiliza os pontos 3D carregados de um arquivo referentes à uma nuvem de pontos previamente gerada.
     % Define o número de pontos para simulação:
@@ -126,33 +123,34 @@ else
         % http://robots.stanford.edu/cs223b04/JeanYvesCalib/htmls/example5.html.
         P_HC_right_3D= matrizT_Stereo*P_HC_left_3D;
         
-        % As coordenadas homogêneas do ponto 2D da câmera esquerda é
-        % determinado usando a matriz "M_Intrinc_L" e o ponto P com relação à câmera esquerda:
+        % As coordenadas homogêneas do ponto 2D mapeado no sistema de referência da cãmera esquerda é
+        % determinado usando a matriz M e o ponto P com relaçãop a câmera direita:
         p_left_2D_H= M_Intrinc_L*P_HC_left_3D;
         xL= p_left_2D_H(1);
         yL= p_left_2D_H(2);
         wL= p_left_2D_H(3);
 
-        % Converte o ponto 2D de homogêneo para cartesiano e em pixel:
+        % Converte de homogêneo para cartesiano e em pixel com relação ao sensor de imagem da câmera esquerda:
         uL(ctPonto)= ((xL/wL)/pixelSize);
         vL(ctPonto)= ((yL/wL)/pixelSize); 
 
-        % O mesmo procedimento é feito para a câmera direita:
+        % As coordenadas homogêneas do ponto mapeado no sistema de referência da cãmera direita é:
         p_right_2D_H= M_Intrinc_R*P_HC_right_3D; 
         xR= p_right_2D_H(1);
         yR= p_right_2D_H(2);
         wR= p_right_2D_H(3);
 
-        % Converte o ponto 2D de homogêneo para cartesiano e em pixel:
+        % Converte de homogêneo para cartesiano e em pixel com relação ao sensor de imagem da câmera direita:
         uR(ctPonto)= ((xR/wR)/pixelSize);
         vR(ctPonto)= ((yR/wR)/pixelSize);
-    end 
-    p_left_2D= [uL; vL];
-    p_right_2D= [uR; vR]; 
-    distanciaNominal= pontos3D(:,3);    
+    end    
+    
 end
 
- 
+p_left_2D= [uL; vL];
+p_right_2D= [uR; vR];  
+
+distanciaNominal= pontos3D_aux(:,3);
 
 if HabShowPontosPlanoImagem
     close all;

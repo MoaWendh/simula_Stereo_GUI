@@ -132,10 +132,10 @@ else
 end
 
 
-[handles.X_L_sim handles.X_R_sim]= fSimulaIncertezaStereo(handles.ptoPlanoImagem_left, handles.ptoPlanoImagem_right, ...
-                                                   pontos3D, handles.paramStereo, handles.incerteza, ...
-                                                   handles.carregaCalibracaoFromFile, handles.numSimulacoes, ...
-                                                   handles.HabShowPontos3D);
+[handles.X_L_sim handles.X_R_sim]= fSimulaPontos3DStereo(handles.ptoPlanoImagem_left, handles.ptoPlanoImagem_right, ...
+                                                         pontos3D, handles.paramStereo, handles.incerteza, ...
+                                                         handles.carregaCalibracaoFromFile, handles.numSimulacoes, ...
+                                                         handles.HabShowPontos3D);
 
 handles.pbAnalisaIncertezas.Enable= 'on';                                               
                                                
@@ -766,14 +766,18 @@ if hObject.Value
     handles.pbLoadPontos3D.Enable= 'on';
     handles.editCoordenadasXYZ.Enable= 'off';
     handles.pbCalaculaPontosNoPlanoImagem.Enable= 'off';
+    handles.rdSimulaPontoComIncrementoDaDistancia.Enable= 'off';    
     handles.editIncrementoDistancia.Enable= 'off';
-    handles.editDistanciaMaxima.Enable= 'off';        
+    handles.editDistanciaMaxima.Enable= 'off'; 
 else
     handles.pbLoadPontos3D.Enable= 'off';
     handles.editCoordenadasXYZ.Enable= 'on';
     handles.pbCalaculaPontosNoPlanoImagem.Enable= 'on';   
-    handles.editIncrementoDistancia.Enable= 'on';
-    handles.editDistanciaMaxima.Enable= 'on';    
+    handles.rdSimulaPontoComIncrementoDaDistancia.Enable= 'on'; 
+    if handles.HabilitaIncrementoDistancia
+        handles.editIncrementoDistancia.Enable= 'on';
+        handles.editDistanciaMaxima.Enable= 'on';
+    end    
 end
 
 handles.carregaPontosFromFile= hObject.Value;
@@ -1439,6 +1443,7 @@ else
 end
 
 handles.HabilitaIncrementoDistancia= hObject.Value;
+handles.pbSimulaPontos3D.Enable= 'off';
 
 % Update handles structure
 guidata(hObject, handles);
