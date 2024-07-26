@@ -26,8 +26,8 @@ function [XL,XR] = fStereoTriangulation(xL, xR, om, T, ...
 % (c) Jean-Yves Bouguet - Intel Corporation - April 9th, 2003
 
 %--- Normalize the image projection according to the intrinsic parameters of the left and right cameras
-xt = normalize_pixel(xL,fc_left,cc_left,kc_left,alpha_c_left);
-xtt = normalize_pixel(xR,fc_right,cc_right,kc_right,alpha_c_right);
+xt = normalize_pixel(xL, fc_left, cc_left, kc_left, alpha_c_left);
+xtt = normalize_pixel(xR, fc_right, cc_right, kc_right, alpha_c_right);
 
 %--- Extend the normalized projections in homogeneous coordinates
 xt = [xt;ones(1,size(xt,2))];

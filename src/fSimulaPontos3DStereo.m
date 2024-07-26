@@ -1,16 +1,30 @@
-function [X_L_sim X_R_sim]= fSimulaPontos3DStereo(ptoPlanoImagem_left, ptoPlanoImagem_right, ...
-                                           pontos3D, paramStereo, incerteza, ... 
-                                           carregaCalibracaoFromFile, numSimulacoes, ...
-                                           HabShowPontos3D)
+function [X_L_sim X_R_sim residuo_X_L residuo_X_R]= fSimulaPontos3DStereo(ptoPlanoImagem_left, ...
+                                                                          ptoPlanoImagem_right, ...
+                                                                          pontos3D, ...
+                                                                          paramStereo, ...
+                                                                          incerteza, ... 
+                                                                          carregaCalibracaoFromFile, ...
+                                                                          numSimulacoes, ...
+                                                                          HabShowPontos3D)
 clc;
 
-% Fator K define o fator de ambrangênica das incertezas usadas na calibração: 
-fatorK= 1;
+% Fatores K define os fatores de ambrangência para cada um dos parãmetros.
+% Para facilitar a análise de qual incerteza é mais significativa.
+% 0: elimina a incerteza;
+% 1: incerteza normal;
+% >1: Amplifica a incertez
+% O fator K= 0.333 é decorrente do fator de abrangência da calibração Yves Bouguet, pois ele afirma
+% que os erros são 3 sigmas.
+fatorK_ext_rot= 0.0;
+fatorK_ext_transl= 0.333;
+fatorK_int_focal= 0.333;
+fatorK_int_disp= 0.2;
+fatorK_int_xy= 0.2;
 
 % **************************** Carrega os parâmetros estéreo:
 % Carrega o comprimento focal já em mm: 
-f_L= [paramStereo.comprimentoFocal_L(1) paramStereo.comprimentoFocal_L(1)];
-f_R= [paramStereo.comprimentoFocal_L(1) paramStereo.comprimentoFocal_L(1)];
+f_L= [paramStereo.comprimentoFocal_L(1) paramStereo.comprimentoFocal_L(2)];
+f_R= [paramStereo.comprimentoFocal_R(1) paramStereo.comprimentoFocal_R(2)];
 
 % Extraindo os parâmetros par varáveis locais: 
 pixelSize= paramStereo.pixelSize;
@@ -20,10 +34,10 @@ sensorSize= paramStereo.sensorSize(1);
 
 % Origem do sensor:
 u0_L= (paramStereo.sensorOrigin_L(1));
-v0_L= (paramStereo.sensorOrigin_L(1));
+v0_L= (paramStereo.sensorOrigin_L(2));
 
-u0_R= (paramStereo.sensorOrigin_L(1));
-v0_R= (paramStereo.sensorOrigin_L(1));
+u0_R= (paramStereo.sensorOrigin_R(1));
+v0_R= (paramStereo.sensorOrigin_R(2));
 
 % Carrega o vetor de rotação do sistema estéreo:
 vetorR= paramStereo.vetorR; 
@@ -50,23 +64,24 @@ for ctPonto=1:numPontos
     for ctSim= 1:numSimulacoes
         % ******************* Definição das incertezas:
         % Incerteza da disparidade:
-        ud= incerteza.Disparidade;
+        ud= incerteza.Disparidade*fatorK_int_disp;
 
-        % Incerteza na localização da coordenada x no plano imagem:
-        ux= incerteza.X;
+        % Incerteza na localização da coordenada x no plano imagem em pixels:
+        ux= (incerteza.X/pixelSize)*fatorK_int_xy;
 
-        % Incerteza na localização da coordenada y no plano imagem:
-        uy= incerteza.Y;
+        % Incerteza na localização da coordenada y no plano imagem em pixels:
+        uy= (incerteza.Y/pixelSize)*fatorK_int_xy;
 
-        % Incerteza do comprimento focal:                                              
-        uf= incerteza.ComprimentoFocal_L(1)/fatorK;
+        % Incerteza do comprimento focal em pixels:                                              
+        uf= (incerteza.ComprimentoFocal_L(1))*fatorK_int_focal;
         
         % Incerteza no baseline, esta incerteza utliza a mesma incerteza decorrente da tranlação.
-        % Isto porque o cálculo do baseline é pfeito pela translação da cam. R com relação a cam. L:
-        ut= incerteza.TranslacaoStereo/fatorK;
+        % Isto porque o cálculo do baseline é pfeito pela translação da cam. R com relação a cam. L.
+        % Manter em milímetros, pois a calibração fornece a translação em mm:
+        ut= (incerteza.TranslacaoStereo)*fatorK_ext_transl;
 
         % Incerteza no vetor de rotação:
-        uR= incerteza.RotacaoStereo/fatorK;
+        uR= (incerteza.RotacaoStereo)*fatorK_ext_rot;
 
         %******************* Insere os erros em função da incerteza:
         % Inserindo erro no comprimento focal através de uma variação aleatória com diustribuição normal:
@@ -91,20 +106,24 @@ for ctPonto=1:numPontos
         t_sim= t + ut.*randn(3,1);
 
         % Inserindo erro no vetor de rotação:
-         vetorR_sim= vetorR + uR.*randn(3,1);
+        vetorR_sim= vetorR + uR.*randn(3,1);
 
-        % Insere a incerteza em cada pontos do plano imagem esquerdo e direito:
+        % Insere a incerteza em cada pontos do plano imagem esquerdo e direito, o valor do ponto está em pixels,
+        % desta forma a incertez também deverá estar em pixels:
         [nPontos ncoords]= size(pontos3D);
-        ponto_L_sim(1,:)= ponto_L(1,:) + ux*randn();
-        ponto_L_sim(2,:)= ponto_L(2,:) + uy*randn();
+        ponto_L_sim(1,:)= round(ponto_L(1,:) + ux*randn());
+        ponto_L_sim(2,:)= round(ponto_L(2,:) + uy*randn());
 
-        ponto_R_sim(1,:)= ponto_R(1,:) + ux*randn();
-        ponto_R_sim(2,:)= ponto_R(2,:) + uy*randn();
+        ponto_R_sim(1,:)= round(ponto_R(1,:) + ux*randn());
+        ponto_R_sim(2,:)= round(ponto_R(2,:) + uy*randn());
 
         % Nã há necessiade de inserir a distorção das lentes, uma vez que os
         % dados usados pata gerar o 3D já estavam com a distorção corrigida:
-        distorcaoLente_L_sim= [0 0 0 0 0]';
+        distorcaoLente_L_sim= [0 0 0 0 0]'; 
+        %distorcaoLente_L_sim= distorcao_L;
         distorcaoLente_R_sim= [0 0 0 0 0]';
+        %distorcaoLente_R_sim= distorcao_R;
+        
         skell_L_sim= skell_L;
         skell_R_sim= skell_R;
 
@@ -125,9 +144,16 @@ for ctPonto=1:numPontos
                                                       f_L', [u0_L; v0_L],  distorcaoLente_L_sim, skell_L_sim, ...
                                                       f_R', [u0_R; v0_R],  distorcaoLente_R_sim, skell_R_sim);                                              
         end
-                                              
-        X_L_sim(ctPonto,ctSim,:)= X_L_aux';
-        X_R_sim(ctPonto,ctSim,:)= X_R_aux';    
+        
+        % Guarda o valor simulado na variável de saída:
+        X_L_sim(ctPonto, ctSim, :)= X_L_aux';
+        X_R_sim(ctPonto, ctSim, :)= X_R_aux';
+        
+        % Sendo que os pontos 3D de entrada representam uma curva ajustada, então a diferença entre esses
+        % pontos e o simulado deve ser chamado de resíduo:
+        residuo_X_L(ctPonto, ctSim, :)= X_L_aux' - pontos3D(ctPonto,:);
+        residuo_X_R(ctPonto, ctSim, :)= X_R_aux' - pontos3D(ctPonto,:);
+        
     end
 end
 
@@ -139,12 +165,6 @@ if HabShowPontos3D
     ylabel('Y (mm)');
     zlabel('Z (mm)');
     grid on; 
-
-%     xlim=([-1000 1000]);
-%     ylim=([-1000 1000]);    
-%     zlim=([(min(X_R_sim(:,:,3))+100) (max(X_R_sim(:,:,3)) + 100)]);
-%     plot3(X_R_sim(:,:,1), X_R_sim(:,:,2), X_R_sim(:,:,3), '.b');                 
-%     zlim=([(min(X_L_sim(:,:,3))+100) (max(X_L_sim(:,:,3)) + 100)]);
     plot3(X_L_sim(:,:,1), X_L_sim(:,:,2), X_L_sim(:,:,3), '.b');  
     axis equal;
 end
