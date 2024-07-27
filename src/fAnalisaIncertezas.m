@@ -1,6 +1,6 @@
 function resultados= fAnalisaIncertezas(X_L_sim, X_R_sim, numSimulacoes, ...
                                         distanciaNominal, CalculaIncerteza_Y, ...
-                                        carregaPontosFromFile, ...
+                                        carregaPontosFromFile, pontos3D_real, ...
                                         residuo_X_L, residuo_X_R)
 clc;
 close all;
@@ -29,7 +29,7 @@ if carregaPontosFromFile
  
     % Define o valor do eixo coordenado:
     pontos= 1:1:numPontos;
-    fPlotAnaliseA(pontos, dp_L_X, dp_L_Y, dp_L_Z, dp_R_X, dp_R_Y, dp_R_Z, residuo_X_L, residuo_X_R, CalculaIncerteza_Y);    
+    fPlotAnaliseA(pontos, dp_L_X, dp_L_Y, dp_L_Z, dp_R_X, dp_R_Y, dp_R_Z, residuo_X_L, residuo_X_R, CalculaIncerteza_Y, X_L_sim, pontos3D_real);    
 else
     for ctDist=1:numPontos
         media_L_X(ctDist)= mean(X_L_sim(ctDist,:,1));
