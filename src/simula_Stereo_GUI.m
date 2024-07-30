@@ -22,7 +22,7 @@ function varargout = simula_Stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help simula_Stereo_GUI
 
-% Last Modified by GUIDE v2.5 26-Jul-2024 15:52:47
+% Last Modified by GUIDE v2.5 30-Jul-2024 11:05:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -125,17 +125,17 @@ function pbSimulaPontos3D_Callback(hObject, eventdata, handles)
 % hObject    handle to pbSimulaPontos3D (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-if handles.carregaPontosFromFile
-    pontos3D= handles.pontos3D_real;
-else
-    pontos3D= handles.pontos3D_sim;
-end
+% 
+% if handles.carregaPontosFromFile
+%     handles.pontos3D= handles.pontos3D_real;
+% else
+%     handles.pontos3D= handles.pontos3D_sim;
+% end
 
 
 [handles.X_L_sim handles.X_R_sim handles.residuo_X_L handles.residuo_X_R]= fSimulaPontos3DStereo(handles.ptoPlanoImagem_left, ...
                                                                                                  handles.ptoPlanoImagem_right, ...
-                                                                                                 pontos3D, ...
+                                                                                                 handles.pontos3D, ...
                                                                                                  handles.paramStereo, ...
                                                                                                  handles.incerteza, ...
                                                                                                  handles.carregaCalibracaoFromFile, ...
@@ -1072,20 +1072,20 @@ close all;
 %     end
 % end
 
-if handles.carregaPontosFromFile && handles.ArquivoCalibracaoOk
-    pontos3D= handles.pontos3D_real;
-else
-    % Reinicializa algumas variáveis:
-    handles= fReinicializaVariaveis(handles);
 
+% Reinicializa algumas variáveis:
+handles= fReinicializaVariaveis(handles);
+    
+if handles.carregaPontosFromFile && handles.ArquivoCalibracaoOk
+    handles.pontos3D= handles.pontos3D_real;
+else
     % Incrementa distância para o ponto 3D d entrada.
     % Esta função não vale para o spontos 3D carregados de arquiv0:
     if handles.HabilitaIncrementoDistancia
-        pontos3D= fIncrementaDistancia(handles.pontos3D_sim, handles.DistanciaMaximaSim, handles.IncrementoDistancia);
+        handles.pontos3D= fIncrementaDistancia(handles.pontos3D_sim, handles.DistanciaMaximaSim, handles.IncrementoDistancia);
     else
-        pontos3D= handles.pontos3D_sim;       
+        handles.pontos3D= handles.pontos3D_sim;       
     end
-    handles.pontos3D_sim= pontos3D;
 end
 
 % Gera a matriz de transformação homogênea da câmera direita com relação ao mundo:
@@ -1095,7 +1095,8 @@ handles.matrizT_World= [handles.paramStereo.rotLeftCamWorld  handles.paramStereo
 handles.matrizT_Stereo= [handles.paramStereo.matrizR  handles.paramStereo.vetorT; [0 0 0 1]]; 
 
 % Gera as coordenadas do ponto 3D no plano imagem, ainda em mm, para a scam. esquerda e direita:
-[handles.ptoPlanoImagem_left handles.ptoPlanoImagem_right handles.distanciaNominal]= fGeraCoordenadasPlanoImagem(pontos3D, handles.paramStereo, ...
+[handles.ptoPlanoImagem_left handles.ptoPlanoImagem_right handles.distanciaNominal]= fGeraCoordenadasPlanoImagem(handles.pontos3D, ...
+                                                                                                                 handles.paramStereo, ...
                                                                                                                  handles.matrizT_World, ...
                                                                                                                  handles.matrizT_Stereo, ...
                                                                                                                  handles.carregaPontosFromFile, ...
@@ -1389,10 +1390,12 @@ function pbAnalisaIncertezas_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.resultadoSimulacao= fAnalisaIncertezas(handles.X_L_sim, handles.X_R_sim, handles.numSimulacoes,...
+fAnalisaIncertezas(handles.X_L_sim, handles.X_R_sim, handles.numSimulacoes,...
                                                handles.distanciaNominal, handles.CalculaIncerteza_Y, ...
-                                               handles.carregaPontosFromFile, handles.pontos3D_real, ...
-                                               handles.residuo_X_L, handles.residuo_X_R);
+                                               handles.carregaPontosFromFile, handles.pontos3D, ...
+                                               handles.residuo_X_L, handles.residuo_X_R, ...
+                                               handles.ExibeGraficoComEstatistica, ...
+                                               handles.ExibeTabelaComEstatistica);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1578,3 +1581,62 @@ function editIncertezaBaseline_Z_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in rdExibeGraficoComEstatistica.
+function rdExibeGraficoComEstatistica_Callback(hObject, eventdata, handles)
+% hObject    handle to rdExibeGraficoComEstatistica (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rdExibeGraficoComEstatistica
+
+handles.ExibeGraficoComEstatistica= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+% --- Executes on button press in rdExibeTabelaComEstatistica.
+function rdExibeTabelaComEstatistica_Callback(hObject, eventdata, handles)
+% hObject    handle to rdExibeTabelaComEstatistica (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rdExibeTabelaComEstatistica
+
+handles.ExibeTabelaComEstatistica= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+
+% --- Executes during object creation, after setting all properties.
+function rdExibeGraficoComEstatistica_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to rdExibeGraficoComEstatistica (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+handles.ExibeGraficoComEstatistica= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+
+% --- Executes during object creation, after setting all properties.
+function rdExibeTabelaComEstatistica_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to rdExibeTabelaComEstatistica (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+handles.ExibeTabelaComEstatistica= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+

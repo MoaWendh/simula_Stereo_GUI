@@ -25,7 +25,7 @@ fatorK_ext_rot= 0.0;
 fatorK_ext_transl= 0.3;
 fatorK_int_focal= 0.3;
 fatorK_int_disp= 0.5;
-fatorK_int_xy= 1;
+fatorK_int_xy= 0.5;
 
 
 
