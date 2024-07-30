@@ -24,4 +24,5 @@ s.HorizontalAlignment= 'center';
 s.FontColor= 'blue';
 addStyle(uit,s, 'column',[1 2 3 4 5 6]);
 
+
 end
