@@ -1,12 +1,8 @@
 function [p_left_2D p_right_2D distanciaNominal]= fGeraCoordenadasPlanoImagem(pontos3D, paramStereo, ...
                                                                               matrizT_World, ...
                                                                               matrizT_Stereo, ... 
-                                                                              numSimulacoes, ...
                                                                               carregaPontosFromFile, ...
-                                                                              HabShowPontosPlanoImagem, ...
-                                                                              HabilitaIncrementoDistancia, ...
-                                                                              IncrementoDistancia, ...
-                                                                              DistanciaMaximaSim)
+                                                                              HabShowPontosPlanoImagem)
 clc;
 
 % Extraindo os parâmetros par varáveis locais: 
@@ -54,26 +50,13 @@ distorcaoLente_L= [0 0 0 0 0]';
 distorcaoLente_R= [0 0 0 0 0]';
 
 if ~carregaPontosFromFile   
-    % adiciona-se 1 para chegar à distãncia máxima, pois a primeir iteração não é adicionado o incremento:
-    if HabilitaIncrementoDistancia
-        distanciaInicial= pontos3D(3);
-        numDistancias= ceil((DistanciaMaximaSim- distanciaInicial)/IncrementoDistancia) + 1;
-    else
-        numDistancias= 1;
-    end
-    pontos3D_aux= pontos3D;
-    
     % Para cada ponto de entrada é encontrado a sua projeção nos planos imagens
     % equerdo e direito. Apenas depois de conhecidas as coordenadas dos planos
     % imagens, elas sevirão para gerar a simulação para cada um desses pontos:
+    numDistancias= size(pontos3D,1);
     for ctDist=1:numDistancias
-        if ctDist>1 
-            pontos3D_aux(ctDist,1)= pontos3D_aux(ctDist-1,1);   
-            pontos3D_aux(ctDist,2)= pontos3D_aux(ctDist-1,2);
-            pontos3D_aux(ctDist,3)= pontos3D_aux(ctDist-1,3) + IncrementoDistancia;            
-        end 
         % Gera uma coordenada homogênea para o ponto P no espaço 3D. As coordenadas já estão em mm:    
-         P_HC_left_3D=[pontos3D_aux(ctDist,:) 1]';
+         P_HC_left_3D=[pontos3D(ctDist,:) 1]';
 
         
         % Transformar o ponto P com relação ao sistema de coordenadas da câmera esquerda 
@@ -106,7 +89,7 @@ if ~carregaPontosFromFile
     end
     p_left_2D= [uL; vL];
     p_right_2D= [uR; vR]; 
-    distanciaNominal= pontos3D_aux(:,3);
+    distanciaNominal= pontos3D(:,3);
 else
     % Neste caso utiliza os pontos 3D carregados de um arquivo referentes à uma nuvem de pontos previamente gerada.
     % Define o número de pontos para simulação:

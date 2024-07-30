@@ -1055,10 +1055,37 @@ function pbCalaculaPontosNoPlanoImagem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+clc;
+close all;
+
+% Chama função para reinicializar todas as variáveis:
+% if handles.reinicializarVariaveis
+%     myAnswer = questdlg('Deseja reinicializar as variáveis globais?', ...
+%                         'Menu', 'Sim','Não', 'Sim');
+%     switch myAnswer 
+%         case 'Sim'
+%             handles= fReinicializaTodasAsVariaveis(handles);
+%         case 'Não'
+%             return;
+%         otherwise
+%             return;
+%     end
+% end
+
 if handles.carregaPontosFromFile && handles.ArquivoCalibracaoOk
     pontos3D= handles.pontos3D_real;
 else
-    pontos3D= handles.pontos3D_sim;
+    % Reinicializa algumas variáveis:
+    handles= fReinicializaVariaveis(handles);
+
+    % Incrementa distância para o ponto 3D d entrada.
+    % Esta função não vale para o spontos 3D carregados de arquiv0:
+    if handles.HabilitaIncrementoDistancia
+        pontos3D= fIncrementaDistancia(handles.pontos3D_sim, handles.DistanciaMaximaSim, handles.IncrementoDistancia);
+    else
+        pontos3D= handles.pontos3D_sim;       
+    end
+    handles.pontos3D_sim= pontos3D;
 end
 
 % Gera a matriz de transformação homogênea da câmera direita com relação ao mundo:
@@ -1070,14 +1097,9 @@ handles.matrizT_Stereo= [handles.paramStereo.matrizR  handles.paramStereo.vetorT
 % Gera as coordenadas do ponto 3D no plano imagem, ainda em mm, para a scam. esquerda e direita:
 [handles.ptoPlanoImagem_left handles.ptoPlanoImagem_right handles.distanciaNominal]= fGeraCoordenadasPlanoImagem(pontos3D, handles.paramStereo, ...
                                                                                                                  handles.matrizT_World, ...
-                                                                                                                 handles.matrizT_Stereo, ... 
-                                                                                                                 handles.numSimulacoes, ...
+                                                                                                                 handles.matrizT_Stereo, ...
                                                                                                                  handles.carregaPontosFromFile, ...
-                                                                                                                 handles.HabShowPontosPlanoImagem, ...
-                                                                                                                 handles.HabilitaIncrementoDistancia, ...
-                                                                                                                 handles.IncrementoDistancia, ...
-                                                                                                                 handles.DistanciaMaximaSim);                                            
-     
+                                                                                                                 handles.HabShowPontosPlanoImagem);                                                 
 handles.pbSimulaPontos3D.Enable= 'on';
 
 % Update handles structure

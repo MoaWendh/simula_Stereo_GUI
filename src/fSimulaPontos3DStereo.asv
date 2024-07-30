@@ -15,18 +15,17 @@ clc;
 % >1: Amplifica a incertez
 % O fator K= 0.333 é decorrente do fator de abrangência da calibração Yves Bouguet, pois ele afirma
 % que os erros são 3 sigmas.
-% fatorK_ext_rot= 0.0;
-% fatorK_ext_transl= 0.333;
-% fatorK_int_focal= 0.333;
-% fatorK_int_disp= 0.2;
-% fatorK_int_xy= 0.2;
-
 fatorK_ext_rot= 0.0;
-fatorK_ext_transl= 0.3;
-fatorK_int_focal= 0.3;
-fatorK_int_disp= 0.5;
-fatorK_int_xy= 1;
+fatorK_ext_transl= 0.333;
+fatorK_int_focal= 0.333;
+fatorK_int_disp= 0.2;
+fatorK_int_xy= 0.2;
 
+% fatorK_ext_rot= 0.0;
+% fatorK_ext_transl= 0.0;
+% fatorK_int_focal= 0.0;
+% fatorK_int_disp= 0.2;
+% fatorK_int_xy= 0.5;
 
 
 % **************************** Carrega os parâmetros estéreo:
@@ -81,10 +80,7 @@ for ctPonto=1:numPontos
         uy= (incerteza.Y/pixelSize)*fatorK_int_xy;
 
         % Incerteza do comprimento focal em pixels:                                              
-        uf_L(1)= (incerteza.ComprimentoFocal_L(1))*fatorK_int_focal;
-        uf_L(2)= (incerteza.ComprimentoFocal_L(2))*fatorK_int_focal;       
-        uf_R(1)= (incerteza.ComprimentoFocal_R(1))*fatorK_int_focal;
-        uf_R(2)= (incerteza.ComprimentoFocal_R(2))*fatorK_int_focal;   
+        uf= (incerteza.ComprimentoFocal_L(1))*fatorK_int_focal;
         
         % Incerteza no baseline, esta incerteza utliza a mesma incerteza decorrente da tranlação.
         % Isto porque o cálculo do baseline é pfeito pela translação da cam. R com relação a cam. L.
@@ -96,10 +92,10 @@ for ctPonto=1:numPontos
 
         %******************* Insere os erros em função da incerteza:
         % Inserindo erro no comprimento focal através de uma variação aleatória com diustribuição normal:
-        f_L_sim(1)= f_L(1) + uf_L(1)*randn();
-        f_L_sim(2)= f_L(2) + uf_L(2)*randn();
-        f_R_sim(1)= f_R(1) + uf_R(1)*randn();
-        f_R_sim(2)= f_R(2) + uf_R(2)*randn();
+        f_L_sim(1)= f_L(1) + uf*randn();
+        f_L_sim(2)= f_L(2) + uf*randn();
+        f_R_sim(1)= f_R(1) + uf*randn();
+        f_R_sim(2)= f_R(2) + uf*randn();
         
         f_L_1_aux(ctSim)= f_L_sim(1);
         f_L_2_aux(ctSim)= f_L_sim(2);
@@ -164,16 +160,10 @@ for ctPonto=1:numPontos
         % pontos e o simulado deve ser chamado de resíduo:
         residuo_X_L(ctPonto, ctSim, :)= X_L_aux' - pontos3D(ctPonto,:);
         residuo_X_R(ctPonto, ctSim, :)= X_R_aux' - pontos3D(ctPonto,:);
-
-        ax(ctPonto)= mean(X_L_sim(ctPonto,:,1));
-        bx(ctPonto)= std(X_L_sim(ctPonto,:,1));
-
-        ay(ctPonto)= mean(X_L_sim(ctPonto,:,2));
-        by(ctPonto)= std(X_L_sim(ctPonto,:,2));
-
-        az(ctPonto)= mean(X_L_sim(ctPonto,:,3));
-        bz(ctPonto)= std(X_L_sim(ctPonto,:,3));
+        
+        a= std()
     end
+    a=0;
 end
 
 
