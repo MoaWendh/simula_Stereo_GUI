@@ -5,7 +5,9 @@ function [X_L_sim X_R_sim residuo_X_L residuo_X_R]= fSimulaPontos3DStereo(ptoPla
                                                                           incerteza, ... 
                                                                           carregaCalibracaoFromFile, ...
                                                                           numSimulacoes, ...
-                                                                          HabShowPontos3D)
+                                                                          HabShowPontos3D, ...
+                                                                          fatorK_int, ...
+                                                                          fatorK_ext)
 clc;
 
 % Fatores K define os fatores de ambrangência para cada um dos parãmetros.
@@ -21,11 +23,7 @@ clc;
 % fatorK_int_disp= 0.2;
 % fatorK_int_xy= 0.2;
 
-fatorK_ext_rot= 0.0;
-fatorK_ext_transl= 0.3;
-fatorK_int_focal= 0.3;
-fatorK_int_disp= 0.5;
-fatorK_int_xy= 0.5;
+hab_erro_rotacao= 0;
 
 
 
@@ -72,27 +70,27 @@ for ctPonto=1:numPontos
     for ctSim= 1:numSimulacoes
         % ******************* Definição das incertezas:
         % Incerteza da disparidade:
-        ud= incerteza.Disparidade*fatorK_int_disp;
+        ud= incerteza.Disparidade*fatorK_int;
 
         % Incerteza na localização da coordenada x no plano imagem em pixels:
-        ux= (incerteza.X/pixelSize)*fatorK_int_xy;
+        ux= (incerteza.X/pixelSize)*fatorK_int;
 
         % Incerteza na localização da coordenada y no plano imagem em pixels:
-        uy= (incerteza.Y/pixelSize)*fatorK_int_xy;
+        uy= (incerteza.Y/pixelSize)*fatorK_int;
 
         % Incerteza do comprimento focal em pixels:                                              
-        uf_L(1)= (incerteza.ComprimentoFocal_L(1))*fatorK_int_focal;
-        uf_L(2)= (incerteza.ComprimentoFocal_L(2))*fatorK_int_focal;       
-        uf_R(1)= (incerteza.ComprimentoFocal_R(1))*fatorK_int_focal;
-        uf_R(2)= (incerteza.ComprimentoFocal_R(2))*fatorK_int_focal;   
+        uf_L(1)= (incerteza.ComprimentoFocal_L(1))*fatorK_int;
+        uf_L(2)= (incerteza.ComprimentoFocal_L(2))*fatorK_int;       
+        uf_R(1)= (incerteza.ComprimentoFocal_R(1))*fatorK_int;
+        uf_R(2)= (incerteza.ComprimentoFocal_R(2))*fatorK_int;   
         
         % Incerteza no baseline, esta incerteza utliza a mesma incerteza decorrente da tranlação.
         % Isto porque o cálculo do baseline é pfeito pela translação da cam. R com relação a cam. L.
         % Manter em milímetros, pois a calibração fornece a translação em mm:
-        ut= (incerteza.TranslacaoStereo)*fatorK_ext_transl;
+        ut= (incerteza.TranslacaoStereo)*fatorK_ext;
 
         % Incerteza no vetor de rotação:
-        uR= (incerteza.RotacaoStereo)*fatorK_ext_rot;
+        uR= ((incerteza.RotacaoStereo)*fatorK_ext)*hab_erro_rotacao;
 
         %******************* Insere os erros em função da incerteza:
         % Inserindo erro no comprimento focal através de uma variação aleatória com diustribuição normal:

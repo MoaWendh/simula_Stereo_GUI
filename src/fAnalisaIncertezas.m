@@ -67,12 +67,12 @@ else
     % Exibe os resultados:
     close all;
     if ExibeGraficoComEstatistica && ExibeTabelaComEstatistica
-        fPlotAnaliseB(pontos, estat, curvaAjustada);
-        fGeraTabelaEstatistica(pontos, estat, curvaAjustada, distanciaNominal);
+        fPlotAnaliseB(pontos, estat, curvaAjustada, CalculaIncerteza_Y);
+        fGeraTabelaEstatistica(pontos, estat, curvaAjustada, distanciaNominal, CalculaIncerteza_Y);
     elseif ExibeGraficoComEstatistica 
-        fPlotAnaliseB(pontos, estat, curvaAjustada);        
+        fPlotAnaliseB(pontos, estat, curvaAjustada, CalculaIncerteza_Y);        
     elseif ExibeTabelaComEstatistica 
-        fGeraTabelaEstatistica(pontos, estat, curvaAjustada, distanciaNominal);
+        fGeraTabelaEstatistica(pontos, estat, curvaAjustada, distanciaNominal, CalculaIncerteza_Y);
     end
 end
 end

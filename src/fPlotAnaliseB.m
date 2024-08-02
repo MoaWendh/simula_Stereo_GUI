@@ -1,41 +1,65 @@
-function fPlotAnaliseB(pontos, estat, curvaAjustada)
+function fPlotAnaliseB(pontos, estat, curvaAjustada, CalculaIncerteza_Y)
 
 plotaApenasCameraEsquerda=1;
 
 if plotaApenasCameraEsquerda
-    
-    fig1= figure;
-    fig1.Position=[22 100 1250 1160];
+    if CalculaIncerteza_Y
+        fig1= figure;
+        fig1.Position=[22 100 1250 1160];
 
-    subplot(3,1,1);
-    plot(pontos, estat.dp_L_X, '*r');
-    hold on;
-    plot(pontos, curvaAjustada.x, '-b');
-    xlabel('Distância (m)');
-    ylabel('Incerteza (mm)');
-    grid on;
-    subtitle('Incerteza padrão ao longo do eixo "X".');
-    legend('Cam. Left','Cam. Right', 'Location', 'east');
+        subplot(3,1,1);
+        plot(pontos, estat.dp_L_X, '*r');
+        hold on;
+        plot(pontos, curvaAjustada.x, '-b');
+        xlabel('Distância (m)');
+        ylabel('Incerteza (mm)');
+        grid on;
+        subtitle('Incerteza padrão ao longo do eixo "X".');
+        legend('Cam. Left','Cam. Right', 'Location', 'east');
 
-    subplot(3,1,2);
-    plot(pontos, estat.dp_L_Y, '*r');
-    hold on;
-    plot(pontos, curvaAjustada.y, '-b');
-    xlabel('Distância (m)');
-    ylabel('Incerteza (mm)');
-    subtitle('Incerteza padrão ao longo do eixo "Y".');
-    legend('Cam. Left','Cam. Right', 'Location', 'east');
-    grid on;
+        subplot(3,1,2);
+        plot(pontos, estat.dp_L_Y, '*r');
+        hold on;
+        plot(pontos, curvaAjustada.y, '-b');
+        xlabel('Distância (m)');
+        ylabel('Incerteza (mm)');
+        subtitle('Incerteza padrão ao longo do eixo "Y".');
+        legend('Cam. Left','Cam. Right', 'Location', 'east');
+        grid on;
 
-    subplot(3,1,3);
-    plot(pontos, estat.dp_L_Z, '*r');
-    hold on;
-    plot(pontos, curvaAjustada.z, '-b');
-    xlabel('Distância (m)');
-    ylabel('Incerteza (mm)');
-    subtitle('Incerteza padrão ao longo do eixo "Z".');
-    legend('Cam. Left','Cam. Right', 'Location', 'east');
-    grid on;
+        subplot(3,1,3);
+        plot(pontos, estat.dp_L_Z, '*r');
+        hold on;
+        plot(pontos, curvaAjustada.z, '-b');
+        xlabel('Distância (m)');
+        ylabel('Incerteza (mm)');
+        subtitle('Incerteza padrão ao longo do eixo "Z".');
+        legend('Cam. Left','Cam. Right', 'Location', 'east');
+        grid on;
+    else
+        fig1= figure;
+        fig1.Position=[22 100 1250 1160];
+
+        subplot(2,1,1);
+        plot(pontos, estat.dp_L_X, '*r');
+        hold on;
+        plot(pontos, curvaAjustada.x, '-b');
+        xlabel('Distância (m)');
+        ylabel('Incerteza (mm)');
+        grid on;
+        subtitle('Incerteza padrão ao longo do eixo "X".');
+        legend('Cam. Left','Cam. Right', 'Location', 'east');
+
+        subplot(2,1,2);
+        plot(pontos, estat.dp_L_Z, '*r');
+        hold on;
+        plot(pontos, curvaAjustada.z, '-b');
+        xlabel('Distância (m)');
+        ylabel('Incerteza (mm)');
+        subtitle('Incerteza padrão ao longo do eixo "Z".');
+        legend('Cam. Left','Cam. Right', 'Location', 'east');
+        grid on;        
+    end
 
 else
     subplot(3,1,1);

@@ -1649,13 +1649,9 @@ function editFatorKIntrinseco_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editFatorKIntrinseco as text
 %        str2double(get(hObject,'String')) returns contents of editFatorKIntrinseco as a double
 
-if str2num(hObject.String)>=0 && str2num(hObject.String)<=1
-    handles.fatorK_Intrinseco= str2num(hObject.String);
-else
-    hObject.String= num2str(1.0);
-    handles.fatorK_Intrinseco= 1.0;
-    msgbox('O fator K intrínseco deve ter um valor entre 0 e 1.', 'Warn', 'warn');    
-end
+handles.fatorK_Intrinseco= str2num(hObject.String);
+
+if 
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1688,13 +1684,7 @@ function editFatorKExtrinseco_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editFatorKExtrinseco as text
 %        str2double(get(hObject,'String')) returns contents of editFatorKExtrinseco as a double
 
-if str2num(hObject.String)>=0 && str2num(hObject.String)<=1
-    handles.fatorK_Extrinseco= str2num(hObject.String);
-else
-    hObject.String= num2str(1.0);
-    handles.fatorK_Extrinseco= 1.0;
-    msgbox('O fator K extrínseco deve ter um valor entre 0 e 1.', 'Warn', 'warn');    
-end
+handles.fatorK_Extrinseco= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
