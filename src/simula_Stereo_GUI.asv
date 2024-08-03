@@ -22,7 +22,7 @@ function varargout = simula_Stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help simula_Stereo_GUI
 
-% Last Modified by GUIDE v2.5 01-Aug-2024 16:54:46
+% Last Modified by GUIDE v2.5 03-Aug-2024 20:02:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1392,12 +1392,31 @@ function pbAnalisaIncertezas_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-fAnalisaIncertezas(handles.X_L_sim, handles.X_R_sim, handles.numSimulacoes,...
-                                               handles.distanciaNominal, handles.CalculaIncerteza_Y, ...
-                                               handles.carregaPontosFromFile, handles.pontos3D, ...
-                                               handles.residuo_X_L, handles.residuo_X_R, ...
-                                               handles.ExibeGraficoComEstatistica, ...
-                                               handles.ExibeTabelaComEstatistica);
+clc;
+close all;
+
+[handles.estatistica curvaAjustada]= fAnalisaIncertezas(handles.X_L_sim, handles.X_R_sim, handles.numSimulacoes,...
+                                                handles.distanciaNominal, handles.CalculaIncerteza_Y, ...
+                                                handles.carregaPontosFromFile, handles.pontos3D, ...
+                                                handles.residuo_X_L, handles.residuo_X_R);
+
+% Define o valor do eixo coordenado:
+[numPontos]= size(handles.X_L_sim, 1);
+pontos= 1:1:numPontos;
+
+% Exibe os resultados:
+if handles.carregaPontosFromFile
+    fPlotAnaliseA(pontos, estatistica, handles.residuo_X_L, handles.residuo_X_R, handles.CalculaIncerteza_Y, handles.X_L_sim, handles.pontos3D);                                              
+else    
+    if handles.ExibeGraficoComEstatistica && handles.ExibeTabelaComEstatistica
+        fPlotAnaliseB(pontos, estatistica, curvaAjustada, handles.CalculaIncerteza_Y);
+        fGeraTabelaEstatistica(pontos, estatistica, curvaAjustada, handles.distanciaNominal, handles.CalculaIncerteza_Y);
+    elseif handles.ExibeGraficoComEstatistica 
+        fPlotAnaliseB(pontos, estatistica, curvaAjustada, handles.CalculaIncerteza_Y);        
+    elseif handles.ExibeTabelaComEstatistica 
+        fGeraTabelaEstatistica(pontos, estatistica, curvaAjustada, handles.distanciaNominal, handles.CalculaIncerteza_Y);
+    end                                           
+end
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1649,9 +1668,13 @@ function editFatorKIntrinseco_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editFatorKIntrinseco as text
 %        str2double(get(hObject,'String')) returns contents of editFatorKIntrinseco as a double
 
-handles.fatorK_Intrinseco= str2num(hObject.String);
-
-if 
+if str2num(hObject.String)>=0 && str2num(hObject.String)<=1
+    handles.fatorK_Intrinseco= str2num(hObject.String);
+else
+    hObject.String= num2str(1.0);
+    handles.fatorK_Intrinseco= 1.0;
+    msgbox('O fator K intrínseco deve ter um valor entre 0 e 1.', 'Warn', 'warn');    
+end
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1684,7 +1707,13 @@ function editFatorKExtrinseco_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editFatorKExtrinseco as text
 %        str2double(get(hObject,'String')) returns contents of editFatorKExtrinseco as a double
 
-handles.fatorK_Extrinseco= str2num(hObject.String);
+if str2num(hObject.String)>=0 && str2num(hObject.String)<=1
+    handles.fatorK_Extrinseco= str2num(hObject.String);
+else
+    hObject.String= num2str(1.0);
+    handles.fatorK_Extrinseco= 1.0;
+    msgbox('O fator K extrínseco deve ter um valor entre 0 e 1.', 'Warn', 'warn');    
+end
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1706,5 +1735,16 @@ handles.fatorK_Extrinseco= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
+
+
+
+
+% --- Executes on button press in pushbutton12pbSalvaTabelaExcell.
+function pushbutton12pbSalvaTabelaExcell_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton12pbSalvaTabelaExcell (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+fGeraTabelaExcell(estatistica, numLinhas);
 
 

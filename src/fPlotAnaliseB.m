@@ -1,4 +1,4 @@
-function fPlotAnaliseB(pontos, estat, curvaAjustada, CalculaIncerteza_Y)
+function fPlotAnaliseB(pontos, estatistica, curvaAjustada, CalculaIncerteza_Y)
 
 plotaApenasCameraEsquerda=1;
 
@@ -8,7 +8,7 @@ if plotaApenasCameraEsquerda
         fig1.Position=[22 100 1250 1160];
 
         subplot(3,1,1);
-        plot(pontos, estat.dp_L_X, '*r');
+        plot(pontos, estatistica.dp_L.x, '*r');
         hold on;
         plot(pontos, curvaAjustada.x, '-b');
         xlabel('Distância (m)');
@@ -18,7 +18,7 @@ if plotaApenasCameraEsquerda
         legend('Cam. Left','Cam. Right', 'Location', 'east');
 
         subplot(3,1,2);
-        plot(pontos, estat.dp_L_Y, '*r');
+        plot(pontos, estatistica.dp_L.y, '*r');
         hold on;
         plot(pontos, curvaAjustada.y, '-b');
         xlabel('Distância (m)');
@@ -28,7 +28,7 @@ if plotaApenasCameraEsquerda
         grid on;
 
         subplot(3,1,3);
-        plot(pontos, estat.dp_L_Z, '*r');
+        plot(pontos, estatistica.dp_L.z, '*r');
         hold on;
         plot(pontos, curvaAjustada.z, '-b');
         xlabel('Distância (m)');
@@ -41,7 +41,7 @@ if plotaApenasCameraEsquerda
         fig1.Position=[22 100 1250 1160];
 
         subplot(2,1,1);
-        plot(pontos, estat.dp_L_X, '*r');
+        plot(pontos, estatistica.dp_L.x, '*r');
         hold on;
         plot(pontos, curvaAjustada.x, '-b');
         xlabel('Distância (m)');
@@ -51,7 +51,7 @@ if plotaApenasCameraEsquerda
         legend('Cam. Left','Cam. Right', 'Location', 'east');
 
         subplot(2,1,2);
-        plot(pontos, estat.dp_L_Z, '*r');
+        plot(pontos, estatistica.dp_L.z, '*r');
         hold on;
         plot(pontos, curvaAjustada.z, '-b');
         xlabel('Distância (m)');
@@ -63,9 +63,9 @@ if plotaApenasCameraEsquerda
 
 else
     subplot(3,1,1);
-    plot(pontos, estat.dp_L_X, '*r');
+    plot(pontos, estatistica.dp_L.x, '*r');
     hold on;
-    plot(pontos, estat.dp_R_X, 'ob');
+    plot(pontos, estatistica.dp_R.x, 'ob');
     xlabel('Distância (m)');
     ylabel('Incerteza (mm)');
     grid on;
@@ -73,9 +73,9 @@ else
     legend('Cam. Left','Cam. Right', 'Location', 'east');
 
     subplot(3,1,2);
-    plot(pontos, estat.dp_L_Y, '*r');
+    plot(pontos, estatistica.dp_L.y, '*r');
     hold on;
-    plot(pontos, estat.dp_R_Y, 'ob');
+    plot(pontos, estatistica.dp_R.y, 'ob');
     xlabel('Distância (m)');
     ylabel('Incerteza (mm)');
     subtitle('Incerteza padrão ao longo do eixo "Y".');
@@ -83,9 +83,9 @@ else
     grid on;
 
     subplot(3,1,3);
-    plot(pontos, estat.dp_L_Z, '*r');
+    plot(pontos, estatistica.dp_L.z, '*r');
     hold on;
-    plot(pontos, estat.dp_R_Z, 'ob');
+    plot(pontos, estatistica.dp_R.z, 'ob');
     xlabel('Distância (m)');
     ylabel('Incerteza (mm)');
     subtitle('Incerteza padrão ao longo do eixo "Z".');
@@ -95,10 +95,10 @@ else
     fig2= figure;
 
     subplot(2,1,1);
-    plot(pontos, estat.dp_R_X, '*-b');
+    plot(pontos, estatistica.dp_R.x, '*-b');
     hold on;
-    plot(pontos, estat.dp_R_Y, '*-g');
-    plot(pontos, estat.dp_R_Z, '*-r');
+    plot(pontos, estatistica.dp_R.y, '*-g');
+    plot(pontos, estatistica.dp_R.z, '*-r');
     xlabel('Distância (m)');
     ylabel('Incerteza (mm)');
     grid on;
@@ -106,10 +106,10 @@ else
     legend('Incerteza X','Incerteza Y','Incerteza Z', 'Location', 'north');
 
     subplot(2,1,2);
-    plot(pontos, estat.dp_L_X, '*-b');
+    plot(pontos, estatistica.dp_L.x, '*-b');
     hold on;
-    plot(pontos, estat.dp_L_Y, '*-g');
-    plot(pontos, estat.dp_L_Z, '*-r');
+    plot(pontos, estatistica.dp_L.y, '*-g');
+    plot(pontos, estatistica.dp_L.z, '*-r');
     plot(pontos, curvaAjustada.z,'-g');
     xlabel('Distância (m)');
     ylabel('Incerteza (mm)');

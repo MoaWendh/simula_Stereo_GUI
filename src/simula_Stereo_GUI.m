@@ -22,7 +22,7 @@ function varargout = simula_Stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help simula_Stereo_GUI
 
-% Last Modified by GUIDE v2.5 01-Aug-2024 16:54:46
+% Last Modified by GUIDE v2.5 03-Aug-2024 20:07:29
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1022,6 +1022,8 @@ handles.outTranslacaoWorld.String= str2mat(msg);
 
 handles.ArquivoCalibracaoOk= 1;
 
+handles.pbSalvaTabelaExcell.Enable= 'off';
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -1392,12 +1394,36 @@ function pbAnalisaIncertezas_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-fAnalisaIncertezas(handles.X_L_sim, handles.X_R_sim, handles.numSimulacoes,...
-                                               handles.distanciaNominal, handles.CalculaIncerteza_Y, ...
-                                               handles.carregaPontosFromFile, handles.pontos3D, ...
-                                               handles.residuo_X_L, handles.residuo_X_R, ...
-                                               handles.ExibeGraficoComEstatistica, ...
-                                               handles.ExibeTabelaComEstatistica);
+clc;
+close all;
+
+[estatistica curvaAjustada]= fAnalisaIncertezas(handles.X_L_sim, handles.X_R_sim, handles.numSimulacoes,...
+                                                handles.distanciaNominal, handles.CalculaIncerteza_Y, ...
+                                                handles.carregaPontosFromFile, handles.pontos3D, ...
+                                                handles.residuo_X_L, handles.residuo_X_R);
+
+% Define o valor do eixo coordenado:
+[numPontos]= size(handles.X_L_sim, 1);
+pontos= 1:1:numPontos;
+
+% Exibe os resultados:
+if handles.carregaPontosFromFile
+    fPlotAnaliseA(pontos, estatistica, handles.residuo_X_L, handles.residuo_X_R, handles.CalculaIncerteza_Y, handles.X_L_sim, handles.pontos3D);                                              
+else    
+    if handles.ExibeGraficoComEstatistica && handles.ExibeTabelaComEstatistica
+        fPlotAnaliseB(pontos, estatistica, curvaAjustada, handles.CalculaIncerteza_Y);
+        fGeraTabelaEstatistica(pontos, estatistica, curvaAjustada, handles.distanciaNominal, handles.CalculaIncerteza_Y);
+    elseif handles.ExibeGraficoComEstatistica 
+        fPlotAnaliseB(pontos, estatistica, curvaAjustada, handles.CalculaIncerteza_Y);        
+    elseif handles.ExibeTabelaComEstatistica 
+        fGeraTabelaEstatistica(pontos, estatistica, curvaAjustada, handles.distanciaNominal, handles.CalculaIncerteza_Y);
+    end                                           
+end
+
+% Gera uma variavel global com a estatistica:
+handles.estatistica= estatistica;
+
+handles.pbSalvaTabelaExcell.Enable= 'on';
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1716,5 +1742,16 @@ handles.fatorK_Extrinseco= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
+
+
+
+
+% --- Executes on button press in pbSalvaTabelaExcell.
+function pbSalvaTabelaExcell_Callback(hObject, eventdata, handles)
+% hObject    handle to pbSalvaTabelaExcell (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+fGeraTabelaExcell(handles.estatistica);
 
 
