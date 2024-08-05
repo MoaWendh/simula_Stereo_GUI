@@ -39,7 +39,9 @@ if carregaPontosFromFile
     estatistica.max_R.z= max(residuo_X_R(:,:,3));
     
     estatistica.distancia_L= mean(X_L_sim(:,1,3))/1000;
-    estatistica.distancia_R= mean(X_R_sim(:,1,3))/1000; 
+    estatistica.distancia_R= mean(X_R_sim(:,1,3))/1000;
+    
+    curvaAjustada= 0;
 else
     for ctDist=1:numPontos
         estatistica.media_L.x(ctDist)= mean(X_L_sim(ctDist,:,1));
@@ -78,15 +80,40 @@ else
         estatistica.distancia_R(ctDist)= estatistica.media_R.z(ctDist)/1000;
     end
     % Define o valor do eixo coordenado:
-    pontos= distanciaNominal/1000; 
+    %     pontos= distanciaNominal/1000; 
+    %     
+    %     p= polyfit(pontos, estatistica.dp_L.x, 2);
+    %     curvaAjustada.x= polyval(p, pontos);
+    %     
+    %     p= polyfit(pontos, estatistica.dp_L.y, 2);
+    %     curvaAjustada.y= polyval(p, pontos);
+    %     
+    %     p= polyfit(pontos, estatistica.dp_L.z, 2);
+    %     curvaAjustada.z= polyval(p, pontos);
     
-    p= polyfit(pontos, estatistica.dp_L.x, 2);
-    curvaAjustada.x= polyval(p, pontos);
+    % Efetua um ajuste de curva considerando as n distãnicas simuladas:
+    % Parâmetro t para cada ponto (normalizado de 0 a 1)
+    numIntervalos= size(estatistica.distancia_L, 2);
+    valFim= max(estatistica.distancia_L);
+    valIni= min(estatistica.distancia_L);
+    t = estatistica.distancia_L;
+
+    % Ajuste de polinômio suave para coordenadas x, y e z usando fittype e fit
+    poly_order_x= 1;
+    poly_order_y= 1;
+    poly_order_z= 2; 
+
+    % Ajuste para a coordenada x:
+    tipoDeAjuste_x = fittype(sprintf('poly%d', poly_order_x));
+    curvaAjustada.x= fit(t(:), estatistica.dp_L.x(:), tipoDeAjuste_x);
     
-    p= polyfit(pontos, estatistica.dp_L.y, 2);
-    curvaAjustada.y= polyval(p, pontos);
+    % Ajuste para a coordenada y:
+    tipoDeAjuste_y = fittype(sprintf('poly%d', poly_order_y));
+    curvaAjustada.y= fit(t(:), estatistica.dp_L.y(:), tipoDeAjuste_y);
+
+    % Ajuste para a coordenada z:
+    tipoDeAjuste_z = fittype(sprintf('poly%d', poly_order_z));
+    curvaAjustada.z= fit(t(:), estatistica.dp_L.z(:), tipoDeAjuste_z);    
     
-    p= polyfit(pontos, estatistica.dp_L.z, 2);
-    curvaAjustada.z= polyval(p, pontos);
 end
 end

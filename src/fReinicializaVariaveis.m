@@ -26,6 +26,7 @@ if isfield(handles, 'distanciaNominal')
 end
 
 handles.pbAnalisaIncertezas.Enable= 'off'; 
-
+handles.pbSalvaTabelaExcell.Enable= 'off';
+handles.pbSimulaPontos3D.Enable= 'off';
 
 end

@@ -146,7 +146,8 @@ function pbSimulaPontos3D_Callback(hObject, eventdata, handles)
                                                      
                                                      
 handles.pbAnalisaIncertezas.Enable= 'on';                                               
-                                               
+handles.pbSalvaTabelaExcell.Enable= 'off';
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -193,8 +194,11 @@ function editIncertezaY_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncertezaY as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaY as a double
 
-handles.incerteza.Y= str2double(hObject.String);
 
+% Reinicializa algumas variáveis:
+handles= fReinicializaVariaveis(handles);
+
+handles.incerteza.Y= str2double(hObject.String);
 
 handles.editIncertezaDisparidade.String= num2str(sqrt(handles.incerteza.X^2 + handles.incerteza.Y^2));
 
@@ -229,6 +233,10 @@ function editIncertezaX_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of editIncertezaX as text
 %        str2double(get(hObject,'String')) returns contents of editIncertezaX as a double
+
+
+% Reinicializa algumas variáveis:
+handles= fReinicializaVariaveis(handles);
 
 handles.incerteza.X= str2double(hObject.String);
 
@@ -346,10 +354,11 @@ function editCoordenadasXYZ_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editCoordenadasXYZ as text
 %        str2double(get(hObject,'String')) returns contents of editCoordenadasXYZ as a double
 
-handles.pontos3D_sim= str2num(hObject.String);
 
-handles.pbSimulaPontos3D.Enable= 'off';
-handles.pbAnalisaIncertezas.Enable= 'off'; 
+% Reinicializa algumas variáveis:
+handles= fReinicializaVariaveis(handles);
+
+handles.pontos3D_sim= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1120,9 +1129,11 @@ function editNumeroDeSimulacoes_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editNumeroDeSimulacoes as text
 %        str2double(get(hObject,'String')) returns contents of editNumeroDeSimulacoes as a double
 
-handles.numSimulacoes= str2num(hObject.String);
 
-handles.pbAnalisaIncertezas.Enable= 'off';
+% Reinicializa algumas variáveis:
+handles= fReinicializaVariaveis(handles);
+
+handles.numSimulacoes= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1438,11 +1449,11 @@ function editIncrementoDistancia_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editIncrementoDistancia as text
 %        str2double(get(hObject,'String')) returns contents of editIncrementoDistancia as a double
 
+
+% Reinicializa algumas variáveis:
+handles= fReinicializaVariaveis(handles);
+
 handles.IncrementoDistancia= str2num(hObject.String);
-
-
-handles.pbSimulaPontos3D.Enable= 'off';
-handles.pbAnalisaIncertezas.Enable= 'off';  
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1474,10 +1485,12 @@ function editDistanciaMaxima_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editDistanciaMaxima as text
 %        str2double(get(hObject,'String')) returns contents of editDistanciaMaxima as a double
 
+
+% Reinicializa algumas variáveis:
+handles= fReinicializaVariaveis(handles);
+
 handles.DistanciaMaximaSim= str2num(hObject.String);
 
-handles.pbSimulaPontos3D.Enable= 'off';
-handles.pbAnalisaIncertezas.Enable= 'off';
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1675,6 +1688,10 @@ function editFatorKIntrinseco_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of editFatorKIntrinseco as text
 %        str2double(get(hObject,'String')) returns contents of editFatorKIntrinseco as a double
 
+
+% Reinicializa algumas variáveis:
+handles= fReinicializaVariaveis(handles);
+
 if str2num(hObject.String)>=0 && str2num(hObject.String)<=1
     handles.fatorK_Intrinseco= str2num(hObject.String);
 else
@@ -1713,6 +1730,10 @@ function editFatorKExtrinseco_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of editFatorKExtrinseco as text
 %        str2double(get(hObject,'String')) returns contents of editFatorKExtrinseco as a double
+
+
+% Reinicializa algumas variáveis:
+handles= fReinicializaVariaveis(handles);
 
 if str2num(hObject.String)>=0 && str2num(hObject.String)<=1
     handles.fatorK_Extrinseco= str2num(hObject.String);

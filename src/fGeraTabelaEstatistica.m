@@ -2,10 +2,10 @@ function fGeraTabelaEstatistica(pontos, estatistica, curvaAjustada, distanciaNom
 clc;
 
 if CalculaIncerteza_Y
-    colName= {'Dist. Nominal(m)', 'Dist. Sim(m)', 'DP X(mm)', 'DP Z(mm)', 'Residuo Min X(mm)', 'Residuo Min Z(mm)', 'Residuo Max X(mm)', 'Residuo Max Z(mm)'};
+    colName= {'Dist. Nominal(m)', 'Dist. Sim(m)', 'DP X(mm)',  'Residuo Min X(mm)', 'Residuo Max X(mm)', 'DP Z(mm)', 'Residuo Min Z(mm)',  'Residuo Max Z(mm)'};
     distancia_L= estatistica.distancia_L; %*1000;
     distanciaNominal= distanciaNominal/1000;
-    t= table(distanciaNominal, distancia_L', estatistica.dp_L.x', estatistica.dp_L.z', estatistica.min_L.x', estatistica.min_L.z', estatistica.max_L.x', estatistica.max_L.z');
+    t= table(distanciaNominal, distancia_L', estatistica.dp_L.x', estatistica.min_L.x', estatistica.max_L.x', estatistica.dp_L.z', estatistica.min_L.z',  estatistica.max_L.z');
     t.Properties.VariableNames= colName;
     
     fig3= uifigure;
@@ -20,13 +20,20 @@ if CalculaIncerteza_Y
     % Formatação tabela:
     s= uistyle;
     s.HorizontalAlignment= 'center';
+    s.FontColor= 'red';
+    addStyle(uit,s, 'column',[3 6]);
+    
+    % Formatação tabela:
+    s= uistyle;
+    s.HorizontalAlignment= 'center';
     s.FontColor= 'blue';
-    addStyle(uit,s, 'column',[1 2 3 4 5 6]);
+    addStyle(uit,s, 'column',[4 5 7 8]);  
+
 else
-    colName= {'Dist. Nominal(m)', 'Dist. Sim(m)', 'DP X(mm)', 'DP Z(mm)', 'Residuo Min X(mm)', 'Residuo Min Z(mm)', 'Residuo Max X(mm)', 'Residuo Max Z(mm)'};
+    colName= {'Dist. Nominal (m)', 'Dist. Medida (m)', 'DP X (mm)',  'Resíduo Min X (mm)', 'Resíduo Max X (mm)', 'DP Z (mm)', 'Resíduo Min Z (mm)',  'Resíduo Max Z (mm)'};
     distancia_L= estatistica.distancia_L; %*1000;
     distanciaNominal= distanciaNominal/1000;
-    t= table(distanciaNominal, distancia_L', estatistica.dp_L.x', estatistica.dp_L.z', estatistica.min_L.x', estatistica.min_L.z', estatistica.max_L.x', estatistica.max_L.z');
+    t= table(distanciaNominal, distancia_L', estatistica.dp_L.x', estatistica.min_L.x', estatistica.max_L.x', estatistica.dp_L.z', estatistica.min_L.z',  estatistica.max_L.z');
     t.Properties.VariableNames= colName;
     
     fig3= uifigure;
@@ -37,12 +44,18 @@ else
     uit.InnerPosition= [10 10 1150 175];
     uit.FontSize= 14;
     uit.FontWeight= 'bold';
-
+   
+    % Formatação tabela:
+    s= uistyle;
+    s.HorizontalAlignment= 'center';
+    s.FontColor= 'red';
+    addStyle(uit,s, 'column',[3 6]);
+    
     % Formatação tabela:
     s= uistyle;
     s.HorizontalAlignment= 'center';
     s.FontColor= 'blue';
-    addStyle(uit,s, 'column',[1 2 3 4 5 6]);        
-end
+    addStyle(uit,s, 'column',[4 5 7 8]);    
+ end
 
 end
