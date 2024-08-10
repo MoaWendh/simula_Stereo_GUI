@@ -12,12 +12,15 @@ max_z= estatistica.max_L.z;
 
 distancia= estatistica.distancia_L;
 
-colName= {'Distância (m)', 'DP X (mm)', 'Resíduo Min X (mm)', 'Resíduo Max X (mm)', 'DP Z (mm)', 'Resíduo Min Z (mm)', 'Resíduo Max Z (mm)'};
-t= table(distancia', dp_x', min_x', max_x', dp_z', min_z', max_z');
+distanciaNominal= round(estatistica.distancia_L);
+
+colName= {'Distância nominal (m)','Distância simulada (m)', 'DP X (mm)', 'Resíduo Min X (mm)', 'Resíduo Max X (mm)', 'DP Z (mm)', 'Resíduo Min Z (mm)', 'Resíduo Max Z (mm)'};
+t= table(distanciaNominal', distancia', dp_x', min_x', max_x', dp_z', min_z', max_z');
 t.Properties.VariableNames= colName;
 
 % Arredonda os valores para duas casa decimais:
-t.("Distância (m)")= round(t.("Distância (m)"), 2);
+t.("Distância nominal (m)")= round(t.("Distância nominal (m)"), 2);
+% t.("Distância simulada (m)")= round(t.("Distância simulada (m)"), 2);
 t.("DP X (mm)")= round(t.("DP X (mm)"), 2);
 t.("DP Z (mm)")= round(t.("DP Z (mm)"), 2);
 t.("Resíduo Max X (mm)")= round(t.("Resíduo Max X (mm)"), 2);

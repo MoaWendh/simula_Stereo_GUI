@@ -17,15 +17,15 @@ if plotaApenasCameraEsquerda
         % Exibe os resultados:
         fig1= figure;
         fig1.Position=[8 65 2550 1280];
-        fontSize= 20; 
+        fontSize= 28; 
         
         plot(t*1000, dpX_fit, '-r');
         hold on;
-        plot(estatistica.distancia_L*1000, estatistica.dp_L.x, '*r');
+        plot(estatistica.distancia_L*1000, estatistica.dp_L.x,'.r', 'MarkerSize', 48);
         plot(t*1000, dpY_fit, '-g');        
-        plot(estatistica.distancia_L*1000, estatistica.dp_L.y, '*g');
+        plot(estatistica.distancia_L*1000, estatistica.dp_L.y,'.g', 'MarkerSize', 48);
         plot(t*1000, dpZ_fit, '-b');  
-        plot(estatistica.distancia_L*1000, estatistica.dp_L.z, '*b');
+        plot(estatistica.distancia_L*1000, estatistica.dp_L.z,'.b', 'MarkerSize', 48);
         
         xlabel('Distância (mm)', 'FontSize', fontSize);
         ylabel('Incerteza (mm)', 'FontSize', fontSize);
@@ -39,7 +39,7 @@ if plotaApenasCameraEsquerda
         % Alterar a fonte dos valores dos eixos X e Y
         ax= gca;
         ax.FontName = 'Arial';  % Nome da fonte
-        ax.FontSize = 18;       % Tamanho da fonte           
+        ax.FontSize = 28;       % Tamanho da fonte           
     else
         % Explora a curva ajustada para plotar contra os velores simulados:        
         valFim= max(estatistica.distancia_L);
@@ -55,23 +55,23 @@ if plotaApenasCameraEsquerda
         fig1.Position=[8 65 2550 1280];
         fontSize= 20; 
         
-        plot(estatistica.distancia_L*1000, estatistica.dp_L.x, '*r', 'MarkerSize', 10);
+        plot(estatistica.distancia_L*1000, estatistica.dp_L.x, '.r', 'MarkerSize', 48);
         hold on;
         plot(t*1000, dpX_fit, '-r');
-        plot(estatistica.distancia_L*1000, estatistica.dp_L.z, '*b', 'MarkerSize', 10);
+        plot(estatistica.distancia_L*1000, estatistica.dp_L.z, '.b', 'MarkerSize', 48);
         plot(t*1000, dpZ_fit, '-b');  
         
         xlabel('Distância (mm)', 'FontSize', fontSize);
         ylabel('Incerteza (mm)','FontSize', fontSize);
-        msg= sprintf('Simulação - Incerteza em função da distância (Direções X e Y)');
-        subtitle(msg,'FontSize', fontSize, 'FontWeight', 'bold');   
-        legend('Curva Ajustada: direção X', 'Curva Ajustada: direção Z', '', '','FontSize', fontSize);
+%         msg= sprintf('Simulação - Incerteza em função da distância (Direções X e Y)');
+%         subtitle(msg,'FontSize', fontSize, 'FontWeight', 'bold');   
+        legend('', 'Curva Ajustada: direção X', '', 'Curva Ajustada: direção Z', 'FontSize', fontSize);
         grid on;        
         
         % Alterar a fonte dos valores dos eixos X e Y
         ax= gca;
         ax.FontName = 'Arial';  % Nome da fonte
-        ax.FontSize = 18;       % Tamanho da fonte           
+        ax.FontSize = 28;       % Tamanho da fonte           
     end
 
 else

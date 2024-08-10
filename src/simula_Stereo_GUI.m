@@ -22,7 +22,7 @@ function varargout = simula_Stereo_GUI(varargin)
 
 % Edit the above text to modify the response to help simula_Stereo_GUI
 
-% Last Modified by GUIDE v2.5 03-Aug-2024 20:07:29
+% Last Modified by GUIDE v2.5 06-Aug-2024 13:36:31
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1624,13 +1624,13 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in rdExibeGraficoComEstatistica.
-function rdExibeGraficoComEstatistica_Callback(hObject, eventdata, handles)
-% hObject    handle to rdExibeGraficoComEstatistica (see GCBO)
+% --- Executes on button press in rdExibeGraficoIncerteza.
+function rdExibeGraficoIncerteza_Callback(hObject, eventdata, handles)
+% hObject    handle to rdExibeGraficoIncerteza (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of rdExibeGraficoComEstatistica
+% Hint: get(hObject,'Value') returns toggle state of rdExibeGraficoIncerteza
 
 handles.ExibeGraficoComEstatistica= hObject.Value;
 
@@ -1655,8 +1655,8 @@ guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function rdExibeGraficoComEstatistica_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to rdExibeGraficoComEstatistica (see GCBO)
+function rdExibeGraficoIncerteza_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to rdExibeGraficoIncerteza (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
