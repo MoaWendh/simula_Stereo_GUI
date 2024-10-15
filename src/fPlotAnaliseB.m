@@ -55,14 +55,14 @@ if plotaApenasCameraEsquerda
         fig1.Position=[8 65 2550 1280];
         fontSize= 20; 
         
-        plot(estatistica.distancia_L*1000, estatistica.dp_L.x, '.r', 'MarkerSize', 48);
+        plot(estatistica.distancia_L, estatistica.dp_L.x, '.r', 'MarkerSize', 48);
         hold on;
         plot(t*1000, dpX_fit, '-r');
-        plot(estatistica.distancia_L*1000, estatistica.dp_L.z, '.b', 'MarkerSize', 48);
+        plot(estatistica.distancia_L, estatistica.dp_L.z, '.b', 'MarkerSize', 48);
         plot(t*1000, dpZ_fit, '-b');  
         
-        xlabel('Distância (mm)', 'FontSize', fontSize);
-        ylabel('Incerteza (mm)','FontSize', fontSize);
+        xlabel('Distância (m)', 'FontSize', fontSize);
+        ylabel('Incerteza (m)','FontSize', fontSize);
 %         msg= sprintf('Simulação - Incerteza em função da distância (Direções X e Y)');
 %         subtitle(msg,'FontSize', fontSize, 'FontWeight', 'bold');   
         legend('', 'Curva Ajustada: direção X', '', 'Curva Ajustada: direção Z', 'FontSize', fontSize);
